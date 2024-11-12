@@ -49,6 +49,19 @@ dependencies:
   # Environment Encrypted
   envied: ^0.5.4+1
 
+  # Percent Indicator
+  carousel_slider: ^4.2.1
+  syncfusion_flutter_charts: ^24.1.45
+  health: ^11.1.0
+
+  # Custom Time Chart
+  path_drawing: ^1.0.1
+  touchable: ^1.0.2
+  linked_scroll_controller: ^0.2.0
+
+  # ft_chart
+  fl_chart: ^0.66.0
+
 dev_dependencies:
   # Default
   flutter_test:
