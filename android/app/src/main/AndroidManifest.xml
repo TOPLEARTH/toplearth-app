@@ -66,10 +66,18 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <!-- 쿼리 설정 -->
     <queries>
+        <!-- 기존 설정: PROCESS_TEXT -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+
+        <!-- Health Connect 설정 -->
+        <package android:name="com.google.android.apps.healthdata" />
+        <intent>
+            <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
         </intent>
     </queries>
 </manifest>

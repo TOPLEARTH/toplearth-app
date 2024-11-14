@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:toplearth/app/env/common/environment_factory.dart';
+import 'package:toplearth/app/utility/health_util.dart';
 import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/data/factory/storage_factory.dart';
 import 'package:toplearth/main_app.dart';
@@ -31,7 +32,7 @@ Future<void> onInitSystem() async {
 
   // Permission
   await Permission.activityRecognition.request();
-  // await HealthUtil.initialize();
+  await HealthUtil.initialize();
   await NotificationUtil.initialize();
   await NotificationUtil.setupRemoteNotification();
 
