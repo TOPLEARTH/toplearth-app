@@ -28,10 +28,11 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.team.toplearth"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        coreLibraryDesugaringEnabled true // Required for Java 8+ API desugaring (https://developer.android.com/studio/write/java8-support#library-desugaring).
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -41,8 +42,8 @@ android {
         applicationId = "com.team.toplearth"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdkVersion 21 // 최소 버전은 21로 설정
+        targetSdkVersion 34 // 타겟 버전은 34로 설정
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
@@ -54,8 +55,23 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+    buildFeatures {
+        viewBinding true // ViewBinding 사용
+    }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Kotlin Standard Library
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // WindowManager (Android 12 이상에서 필요 시)
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
+
+    // Desugaring for Java 8+ compatibility
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 }
