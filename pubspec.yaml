@@ -61,6 +61,7 @@ dependencies:
 
   # ft_chart
   fl_chart: ^0.66.0
+  firebase_core: ^3.8.0
 
 dev_dependencies:
   # Default

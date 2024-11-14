@@ -4,6 +4,8 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:toplearth/app/env/common/environment_factory.dart';
 import 'package:toplearth/data/factory/storage_factory.dart';
 import 'package:toplearth/main_app.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:toplearth/firebase_options.dart';
 
 void main() async {
   await onInitSystem();
@@ -15,6 +17,9 @@ void main() async {
 Future<void> onInitSystem() async {
   // Widget Binding
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase Initialize
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // DateTime Formatting
   await initializeDateFormatting();
