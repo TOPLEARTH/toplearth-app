@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:toplearth/NaverMapScreen.dart';
 
 class LocalPushNotifications {
   static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
@@ -37,7 +39,11 @@ class LocalPushNotifications {
   }
 
   static void onNotificationTap(NotificationResponse notificationResponse) {
-    notificationStream.add(notificationResponse.payload ?? '');
+    String payload = notificationResponse.payload ?? '';
+    notificationStream.add(payload);
+
+    // 푸시 알림 클릭 시 NaverMapScreen으로 이동
+    Get.to(() => NaverMapScreen());
   }
 
   static Future showSimpleNotification({

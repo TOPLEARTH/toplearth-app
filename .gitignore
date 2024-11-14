@@ -343,4 +343,7 @@ android/app/google-services.json
 # FlutterFire Congigure
 firebase_options.dart
 
+# Environment config
+assets/config/.dev.env
+
 # End of https://www.toptal.com/developers/gitignore/api/dart,flutter,macos,androidstudio,xcode,windows,visualstudiocode

@@ -36,6 +36,9 @@ PODS:
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
+  - flutter_naver_map (1.3.0):
+    - Flutter
+    - NMapsMap (= 3.19.0)
   - flutter_secure_storage (6.0.0):
     - Flutter
   - GoogleDataTransport (10.1.0):
@@ -72,6 +75,9 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
+  - NMapsGeometry (1.0.2)
+  - NMapsMap (3.19.0):
+    - NMapsGeometry
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -88,6 +94,7 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_naver_map (from `.symlinks/plugins/flutter_naver_map/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - health (from `.symlinks/plugins/health/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -104,6 +111,8 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUtilities
     - nanopb
+    - NMapsGeometry
+    - NMapsMap
     - PromisesObjC
 
 EXTERNAL SOURCES:
@@ -117,6 +126,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_naver_map:
+    :path: ".symlinks/plugins/flutter_naver_map/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
   health:
@@ -139,11 +150,14 @@ SPEC CHECKSUMS:
   FirebaseMessaging: f8a160d99c2c2e5babbbcc90c4a3e15db036aee2
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_local_notifications: df98d66e515e1ca797af436137b4459b160ad8c9
+  flutter_naver_map: d31b1884517151e7b3121e3b24c18733ef4e4387
   flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 26a3abef001b6533cf678d3eb38fd3f614b7872d
   health: 5a380c0f6c4f619535845992993964293962e99e
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
+  NMapsGeometry: 4e02554fa9880ef02ed96b075dc84355d6352479
+  NMapsMap: 99c10429d93340780b6f88d3fc7c0a3850b43664
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47

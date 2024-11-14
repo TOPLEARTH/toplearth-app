@@ -1,9 +1,11 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:toplearth/app/env/common/environment_factory.dart';
+import 'package:toplearth/app/env/dev/dev_environment.dart';
 import 'package:toplearth/app/utility/health_util.dart';
 import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/data/factory/storage_factory.dart';
@@ -21,6 +23,12 @@ void main() async {
 Future<void> onInitSystem() async {
   // Widget Binding
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Naver Map Initialize
+  await NaverMapSdk.instance.initialize(
+    clientId: DevEnvironment.NAVER_CLIENT_ID,
+  );
+
 
   // Firebase Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
