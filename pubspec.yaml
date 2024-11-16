@@ -62,6 +62,11 @@ dependencies:
   touchable: ^1.0.2
   linked_scroll_controller: ^0.2.0
 
+  # kakao login
+  kakao_flutter_sdk: ^1.9.6
+  kakao_flutter_sdk_user: ^1.9.6
+  kakao_flutter_sdk_share: ^1.9.6
+
   # ft_chart
   fl_chart: ^0.66.0
   firebase_core: ^3.8.0

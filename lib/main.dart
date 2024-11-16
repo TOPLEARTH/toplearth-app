@@ -12,6 +12,7 @@ import 'package:toplearth/data/factory/storage_factory.dart';
 import 'package:toplearth/main_app.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:toplearth/firebase_options.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 void main() async {
   await onInitSystem();
@@ -29,6 +30,8 @@ Future<void> onInitSystem() async {
     clientId: DevEnvironment.NAVER_CLIENT_ID,
   );
 
+  // Kakao Login Initialize
+  KakaoSdk.init(nativeAppKey: DevEnvironment.KAKAO_APP_KEY);
 
   // Firebase Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
