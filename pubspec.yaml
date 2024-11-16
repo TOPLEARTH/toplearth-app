@@ -7,7 +7,7 @@ environment:
   sdk: '>=3.4.3 <4.0.0'
 
 dependencies:
-  #Default
+  # Default
   flutter:
     sdk: flutter
   flutter_localizations:
@@ -62,15 +62,13 @@ dependencies:
   touchable: ^1.0.2
   linked_scroll_controller: ^0.2.0
 
-  # kakao login
+  # Kakao Login
   kakao_flutter_sdk: ^1.9.6
   kakao_flutter_sdk_user: ^1.9.6
   kakao_flutter_sdk_share: ^1.9.6
 
-  # apple login
+  # Apple Login
   sign_in_with_apple: ^6.1.3
-
-
 
   # ft_chart
   fl_chart: ^0.66.0
@@ -78,6 +76,7 @@ dependencies:
   firebase_messaging: ^15.1.5
   flutter_local_notifications: ^18.0.1
   flutter_naver_map: ^1.3.0+1
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   # Default
@@ -88,10 +87,10 @@ dev_dependencies:
   # Localization
   intl_translation: ^0.20.0
 
-  # app package name change
+  # App Package Name Change
   change_app_package_name: ^1.4.0
 
-  # app icon
+  # App Icon
   flutter_launcher_icons: ^0.13.1
 
   # Environment Encrypted
@@ -103,7 +102,6 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/icons/
     - assets/icons/
     - assets/animations/
 
@@ -128,3 +126,8 @@ flutter:
           weight: 800
         - asset: assets/fonts/Pretendard-Black.otf
           weight: 900
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon_ios.png"
