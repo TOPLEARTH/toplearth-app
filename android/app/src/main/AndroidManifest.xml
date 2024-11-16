@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tople.toplearth">
+
     <!-- 알림 권한 설정 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -7,15 +8,26 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 알림 권한 설정 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- 위치 권한 설정 -->
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" /> <!-- 위치 권한 설정 -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:label="toplearth"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
+        <!-- 카카오 로그인 설정 -->
+        <activity
+            android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
+            android:exported="true">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kakao@{string/KAKAO_APP_KEY}" android:host="oauth"/>
+            </intent-filter>
+        </activity>
 
         <!-- Widget -->
         <receiver
@@ -24,13 +36,12 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/user_info_widget_info" />
         </receiver>
 
-        <!-- local notification -->
+        <!-- Local notification -->
         <receiver
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />
@@ -43,7 +54,9 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
-        </receiver> <!-- local notification -->
+        </receiver>
+
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -54,28 +67,51 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize"
             android:showWhenLocked="true"
-            android:turnScreenOn="true"> <!-- activity 태그 안에 속성 (showWhenLocked, turnScreenOn) 추가 -->
+            android:turnScreenOn="true">
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"/>
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"/>
+
+            <!-- 기본 런처 설정 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Deep Link 설정 추가 -->
+            <!-- #SETTING -->
+            <!-- 딥링크를 사용하기 위한 사용 설정 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="toplearth.page.link" android:scheme="https" />
+
+                <!-- #SETTING #react-native-kakao-share #KAKAO 카카오 공유하기를 통해 앱에 들어오기 위한 설정 -->
+                <data android:host="kakaolink" android:scheme="kakao@{string/KAKAO_APP_KEY}" />
+            </intent-filter>
+
+            <!-- #SETTING 안드로이드 13버전 다이나믹 링크 작동 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="toplearth.com" />
+            </intent-filter>
         </activity>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
     <!-- 쿼리 설정 -->
     <queries>
-        <!-- 기존 설정: PROCESS_TEXT -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-
-        <!-- Health Connect 설정 -->
         <package android:name="com.google.android.apps.healthdata" />
         <intent>
             <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
