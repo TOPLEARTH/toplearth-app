@@ -1,4 +1,4 @@
-package com.team.toplearth
+package com.tople.toplearth
 
 import io.flutter.embedding.android.FlutterActivity
 

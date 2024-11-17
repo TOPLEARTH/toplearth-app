@@ -1,5 +1,3 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'package:envied/envied.dart';
 import 'package:toplearth/app/env/common/environment.dart';
 
@@ -10,6 +8,18 @@ class DevEnvironment implements Environment {
   @EnviedField(varName: 'API_SERVER_URL', defaultValue: '', obfuscate: true)
   static final String API_SERVER_URL = _DevEnvironment.API_SERVER_URL;
 
+  @EnviedField(varName: 'NAVER_CLIENT_ID')
+  static const String NAVER_CLIENT_ID = _DevEnvironment.NAVER_CLIENT_ID;
+
+  @EnviedField(varName: 'KAKAO_APP_KEY')
+  static const String KAKAO_APP_KEY = _DevEnvironment.KAKAO_APP_KEY;
+
   @override
   String get apiServerUrl => API_SERVER_URL;
+
+  @override
+  String get naverClientId => NAVER_CLIENT_ID;
+
+  @override
+  String get kakaoAppKey => KAKAO_APP_KEY;
 }

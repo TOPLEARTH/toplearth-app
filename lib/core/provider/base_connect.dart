@@ -22,6 +22,15 @@ abstract class BaseConnect extends GetConnect {
     "usedInSplashScreen": "false",
   };
 
+  static const Map<String, String> unusedAuthorization = {
+    "usedAuthorization": "false",
+  };
+
+  static const Map<String, String> usedAuthorization = {
+    "usedAuthorization": "true",
+  };
+
+
   @override
   void onInit() {
     super.onInit();

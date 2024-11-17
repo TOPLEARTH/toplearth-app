@@ -18,7 +18,7 @@ abstract class BaseScreen<T extends GetxController> extends GetView<T> {
       decoration: BoxDecoration(
         color: unSafeAreaColor,
       ),
-      child: wrapWithOuterSafeArea
+      child: wrapWithInnerSafeArea
           ? SafeArea(
               top: setTopOuterSafeArea,
               bottom: setBottomOuterSafeArea,
