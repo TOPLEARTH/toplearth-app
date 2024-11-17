@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-abstract class BaseUsecase extends DisposableInterface {
+abstract class BaseUseCase extends DisposableInterface {
   /// Called immediately after the widget is allocated in memory.
   /// You might use this to initialize something for the controller.
   @override
