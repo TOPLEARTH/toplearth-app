@@ -6,6 +6,8 @@ abstract class AppRoutes {
   static const String ON_BOARDING = '/on-boarding';
   static const String LOGIN = '/login';
 
+  static const String LEGACY = '/legacy';
+
   // 플로깅 시작전, 진행중, 끝난후 인증, 끝난후 라벨링
   static const String PLOGGING_PREPARE = '/plogging-prepare';      // 시작 전 화면
   static const String PLOGGING_PROGRESS = '/plogging-progress';    // 진행 중 화면
@@ -22,4 +24,5 @@ abstract class AppRoutes {
 
   // 앱 설정
   static const String APP_SETTING = '/app-setting';
+  static const String APP_ALARM = '/app-alarm';
 }

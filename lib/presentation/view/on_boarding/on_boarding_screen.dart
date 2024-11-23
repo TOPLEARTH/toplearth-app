@@ -13,15 +13,19 @@ class OnBoardingScreen extends StatefulWidget {
 }
 
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
-  final PageController _pageController = PageController();
-  final RxInt _currentPage = 0.obs;
+  late final PageController _pageController;
+  late final RxInt _currentPage;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
+
     _pageController.addListener(() {
       _currentPage.value = _pageController.page!.round();
     });
+
+    _currentPage = 0.obs;
   }
 
   @override
@@ -42,10 +46,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               child: PageView(
                 controller: _pageController,
                 children: [
-                  Image.asset('assets/images/earth_model_1.png'),
-                  Image.asset('assets/images/earth_model_2.png'),
-                  Image.asset('assets/images/earth_model_3.png'),
-                  Image.asset('assets/images/earth_model_4.png'),
+                  Image.asset('assets/images/on_boarding_1.png'),
+                  Image.asset('assets/images/on_boarding_2.png'),
+                  Image.asset('assets/images/on_boarding_3.png'),
+                  Image.asset('assets/images/on_boarding_4.png'),
                 ],
               ),
             ),
@@ -76,7 +80,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       ),
                       onPressed: () {
                         if (_currentPage.value == 3) {
-                          // If last page, navigate to login
                           Get.offAllNamed(AppRoutes.LOGIN);
                         } else {
                           _pageController.nextPage(

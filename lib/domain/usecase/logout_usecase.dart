@@ -3,7 +3,7 @@ import 'package:toplearth/core/usecase/async_no_condition_usecase.dart';
 import 'package:toplearth/core/usecase/common/base_usecase.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/data/factory/storage_factory.dart';
-import 'package:toplearth/domain/repository/auth_repository.dart';
+import 'package:toplearth/domain/repository/auth/auth_repository.dart';
 
 class LogoutUseCase extends BaseUseCase
     implements AsyncNoConditionUseCase<void> {

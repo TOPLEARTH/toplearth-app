@@ -14,6 +14,7 @@ class SystemProviderImpl implements SystemProvider {
 
   String? _accessToken;
   String? _refreshToken;
+  String? _fcmToken;
 
   /* ------------------------------------------------------------ */
   /* Initialize ------------------------------------------------- */
@@ -27,6 +28,9 @@ class SystemProviderImpl implements SystemProvider {
     );
     _refreshToken = await _secureStorage.read(
       key: SystemProviderExt.refreshToken,
+    );
+    _fcmToken = await _secureStorage.read(
+      key: SystemProviderExt.fcmToken,
     );
   }
 
@@ -52,9 +56,11 @@ class SystemProviderImpl implements SystemProvider {
   Future<void> deallocateTokens() async {
     await _secureStorage.delete(key: SystemProviderExt.accessToken);
     await _secureStorage.delete(key: SystemProviderExt.refreshToken);
+    await _secureStorage.delete(key: SystemProviderExt.fcmToken);
 
     _accessToken = null;
     _refreshToken = null;
+    _fcmToken = null;
   }
 
   /* ------------------------------------------------------------ */
@@ -79,6 +85,11 @@ class SystemProviderImpl implements SystemProvider {
   @override
   String getRefreshToken() {
     return _refreshToken!;
+  }
+
+  @override
+  String? getFCMToken() {
+    return _fcmToken;
   }
 
   /* ------------------------------------------------------------ */
@@ -107,5 +118,15 @@ class SystemProviderImpl implements SystemProvider {
     );
 
     _refreshToken = refreshToken;
+  }
+
+  @override
+  Future<void> setFCMToken(String token) async {
+    await _secureStorage.write(
+      key: SystemProviderExt.fcmToken,
+      value: token,
+    );
+
+    _fcmToken = token;
   }
 }

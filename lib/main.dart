@@ -25,34 +25,42 @@ Future<void> onInitSystem() async {
   // Widget Binding
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Naver Map Initialize
   await NaverMapSdk.instance.initialize(
     clientId: DevEnvironment.NAVER_CLIENT_ID,
   );
 
-  // Kakao Login Initialize
   KakaoSdk.init(nativeAppKey: DevEnvironment.KAKAO_APP_KEY);
 
   // Firebase Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // DateTime Formatting
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting();
-  tz.initializeTimeZones();
-
-  // Permission
-  await Permission.activityRecognition.request();
+  // Health Initialize
   await HealthUtil.initialize();
+
+  // Notification Initialize
   await NotificationUtil.initialize();
   await NotificationUtil.setupRemoteNotification();
 
   // Environment
   await EnvironmentFactory.onInit();
 
-  // Storage & Database
+  // DateTime Formatting
+  await initializeDateFormatting();
+  tz.initializeTimeZones();
+
+  // Storage & Database Initialize
   await StorageFactory.onInit();
+  await StorageFactory.onReady();
+
+  // FCM 토큰 저장
+  String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+  await StorageFactory.systemProvider.setFCMToken(fcmToken ?? '');
+
+  // Permission
+  await Permission.activityRecognition.request();
 }
+
 
 Future<void> onReadySystem() async {
   // Storage & Database

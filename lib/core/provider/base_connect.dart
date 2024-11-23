@@ -87,8 +87,8 @@ abstract class BaseConnect extends GetConnect {
 
       if (!reissueResponse.hasError) {
         await _systemProvider.allocateTokens(
-          accessToken: reissueResponse.body['data']['access_token'],
-          refreshToken: reissueResponse.body['data']['refresh_token'],
+          accessToken: reissueResponse.body['data']['accessToken'],
+          refreshToken: reissueResponse.body['data']['refreshToken'],
         );
       } else {
         await _isExpiredTokens(
@@ -102,7 +102,6 @@ abstract class BaseConnect extends GetConnect {
 
     httpClient.maxAuthRetries = 1;
   }
-
   Future<Response<dynamic>> _reissueToken() async {
     String refreshToken = _systemProvider.getRefreshToken();
 

@@ -4,7 +4,7 @@ import 'package:toplearth/core/usecase/common/base_usecase.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/data/factory/storage_factory.dart';
 import 'package:toplearth/domain/condition/auth/login_by_default_condition.dart';
-import 'package:toplearth/domain/repository/auth_repository.dart';
+import 'package:toplearth/domain/repository/auth/auth_repository.dart';
 
 class LoginByDefaultUseCase extends BaseUseCase
     implements AsyncConditionUseCase<void, LoginByDefaultCondition> {
@@ -33,8 +33,8 @@ class LoginByDefaultUseCase extends BaseUseCase
 
     // Save Json Web Token
     await StorageFactory.systemProvider.allocateTokens(
-      accessToken: state.data!['access_token'],
-      refreshToken: state.data!['refresh_token'],
+      accessToken: state.data!['accessToken'],
+      refreshToken: state.data!['refreshToken'],
     );
 
     // Return Success State
