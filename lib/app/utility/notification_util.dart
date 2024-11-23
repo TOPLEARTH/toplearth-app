@@ -15,7 +15,7 @@ abstract class NotificationUtil {
 
   static const AndroidNotificationDetails
   _androidPlatformLocalChannelSpecifics = AndroidNotificationDetails(
-    'earth_and_i_local_channel_id',
+    'tolpearth_local_channel_id',
     'Toplearth',
     channelDescription: 'Toplearth Channel',
     importance: Importance.max,
@@ -25,7 +25,7 @@ abstract class NotificationUtil {
 
   static const AndroidNotificationDetails
   _androidPlatformRemoteChannelSpecifics = AndroidNotificationDetails(
-    'earth_and_i_remote_channel_id',
+    'toplearth_remote_channel_id',
     'Toplearth',
     channelDescription: 'Toplearth Channel',
     importance: Importance.high,
@@ -72,9 +72,9 @@ abstract class NotificationUtil {
     if (isFlutterLocalNotificationsInitialized) return;
 
     AndroidNotificationChannel channel = const AndroidNotificationChannel(
-      'earth_and_i_remote_channel_id', // id
+      'toplearth_remote_channel_id', // id
       'Toplearth', // title
-      description: 'earth_and_i_remote_channel_description', // description
+      description: 'toplearth_remote_channel_description', // description
       importance: Importance.high,
     );
 

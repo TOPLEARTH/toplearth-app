@@ -5,7 +5,7 @@ import 'package:toplearth/data/provider/auth/auth_remote_provider.dart';
 import 'package:toplearth/domain/condition/auth/login_by_apple_condition.dart';
 import 'package:toplearth/domain/condition/auth/login_by_default_condition.dart';
 import 'package:toplearth/domain/condition/auth/login_by_kakao_condition.dart';
-import 'package:toplearth/domain/repository/auth_repository.dart';
+import 'package:toplearth/domain/repository/auth/auth_repository.dart';
 
 class AuthRepositoryImpl extends GetxService implements AuthRepository {
   late final AuthRemoteProvider _authProvider;
