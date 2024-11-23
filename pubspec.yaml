@@ -42,6 +42,9 @@ dependencies:
   # Extended Nested Scroll View
   extended_nested_scroll_view: ^6.2.1
 
+  # model_viewer_plus
+  model_viewer_plus: ^1.9.0
+
   # Storage
   get_storage: ^2.1.1
   flutter_secure_storage: ^9.2.2
@@ -111,6 +114,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/icons/bottom_navigation/
     - assets/animations/
 
   fonts:
