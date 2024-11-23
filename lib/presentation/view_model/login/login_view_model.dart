@@ -25,7 +25,7 @@ class LoginViewModel extends GetxController {
   late final LoginByAppleUseCase _loginByAppleUsecase;
 
   /* ------------------------------------------------------ */
-  /* Private Fields --------------------------------------- */
+  /* Private Fields -----------------------------------ㅠ---- */
   /* ------------------------------------------------------ */
   late final RxBool _isEnableLoginButton;
   late final RxBool _isEnableGreyBarrier;
@@ -154,7 +154,7 @@ class LoginViewModel extends GetxController {
       ],
     );
 
-    LogUtil.info('Apple Identity Token: ${credential.identityToken}');
+    // LogUtil.info('Apple Identity Token: ${credential.identityToken}');
     return credential.identityToken!;
   }
 }
