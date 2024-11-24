@@ -113,6 +113,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/shares/
     - assets/icons/
     - assets/icons/bottom_navigation/
     - assets/animations/
