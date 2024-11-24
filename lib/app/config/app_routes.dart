@@ -16,8 +16,15 @@ abstract class AppRoutes {
 
   // 그룹 생성, 그룹 참여, 그룹 생성(가입) 완료
   static const String GROUP_CREATE = '/group-create';
+  static const String GROUP_SEARCH = '/group-search';
+  static const String GROUP_CREATE_COMPLETE = '/group-create-complete';
   static const String GROUP_JOIN = '/group-join';
   static const String GROUP_COMPLETE = '/group-complete';
+
+  static const String TEST_CODE = '/test-code';
+
+
+
 
   // 루트 탭
   static const String ROOT = '/';
