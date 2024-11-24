@@ -31,9 +31,9 @@ class GroupBriefState {
 
   factory GroupBriefState.fromJson(Map<String, dynamic> json) {
     return GroupBriefState(
-      teamId: json['team_id'],
-      teamName: json['team_name'],
-      teamCode: json['team_code'],
+      teamId: json['teamId'],
+      teamName: json['teamName'],
+      teamCode: json['teamCode'],
     );
   }
 }
