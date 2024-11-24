@@ -19,6 +19,9 @@ dependencies:
   # Icons
   cupertino_icons: ^1.0.6
 
+  # Social Share
+  social_share: ^2.3.1
+
   # Localization
   intl: ^0.19.0
   timezone: ^0.9.4
@@ -117,6 +120,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/shares/
+    - assets/images/seoul/
     - assets/icons/
     - assets/icons/bottom_navigation/
     - assets/animations/
