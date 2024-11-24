@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_back_app_bar.dart';
@@ -69,7 +70,7 @@ class LegacyScreen extends BaseScreen<RootViewModel> {
 
   Widget _buildTotalUsersSection(BuildContext context) {
     return Container(
-      color: const Color(0xFF0F2A4F),
+      color: ColorSystem.main,
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.center,

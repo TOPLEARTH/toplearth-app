@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/presentation/widget/image/png_image_view.dart';
@@ -145,14 +146,35 @@ class UserMapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Define the color mapping for IDs (100-900) in your SVG
+    const Map<String, Color> colorMap = {
+      '1': Color(0xFFEBF3FA), // 50
+      '2': Color(0xFFD9E8F6), // 100
+      '3': Color(0xFFAFCCEC), // 200
+      '4': Color(0xFF8AB0D9), // 300
+      '5': Color(0xFF6A94C4), // 400
+      '6': Color(0xFF4F7AAE), // 500
+      '7': Color(0xFF3A6495), // 600
+      '8': Color(0xFF2A4F7A), // 700
+      '9': Color(0xFF1A3A5F), // 800
+      '10': Color(0xFF0F2A4F), // 900
+    };
+
     return Container(
       height: 300, // Adjust the height as needed
       width: double.infinity,
       alignment: Alignment.center,
-      child: const PngImageView(
-        assetPath: 'assets/images/map_view.png', // Replace with your map image path
+      child: SvgPicture.asset(
+        'assets/images/seoul/seoul.svg',
         height: 300, // Adjust the height as needed
         width: double.infinity, // Adjust the width as needed
+        colorFilter: const ColorFilter.mode(Colors.transparent, BlendMode.srcIn),
+        placeholderBuilder: (BuildContext context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        theme: SvgTheme(
+          currentColor: colorMap['1']!, // Default color, dynamically updated below
+        ),
       ),
     );
   }

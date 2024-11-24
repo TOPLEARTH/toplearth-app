@@ -147,8 +147,8 @@ class WebSocketController extends BaseWebSocketController {
 }
 
 mixin WebSocketMixin {
-  late final String socketBaseUrl;
-  late final String accessToken;
+  late final String socketServerUrl;
+  String get accessToken => StorageFactory.systemProvider.getAccessToken();
 
   StompClient? _stompClient;
   final RxBool _isConnected = false.obs;
@@ -157,9 +157,15 @@ mixin WebSocketMixin {
 
   /// WebSocket 연결
   void connectToWebSocket() {
+    final token = accessToken;
+    if (token.isEmpty) {
+      debugPrint('⚠️ 토큰이 없어 WebSocket 연결을 시도하지 않습니다.');
+      return;
+    }
+
     _stompClient = StompClient(
       config: StompConfig(
-        url: '$socketBaseUrl/ws-stomp',
+        url: '$socketServerUrl/ws-stomp',
         onConnect: _onConnect,
         beforeConnect: _beforeConnect,
         onDisconnect: _onDisconnect,
@@ -235,9 +241,16 @@ mixin WebSocketMixin {
   }
 
   /// 인증 헤더 생성
-  Map<String, String> _createAuthHeaders() => {
-    'Authorization': 'Bearer $accessToken',
-  };
+  Map<String, String> _createAuthHeaders() {
+    final token = accessToken;
+    if (token.isEmpty) {
+      debugPrint('⚠️ 토큰이 없습니다. 빈 헤더를 반환합니다.');
+      return {};
+    }
+    return {
+      'Authorization': 'Bearer $token',
+    };
+  }
 
   /// 연결 성공 시 호출
   void _onConnect(StompFrame frame) {
@@ -248,6 +261,10 @@ mixin WebSocketMixin {
   /// 연결 시도 중
   Future<void> _beforeConnect() async {
     debugPrint('WebSocket 연결 시도 중...');
+    final token = accessToken;
+    if (token.isEmpty) {
+      throw Exception('토큰이 없어 WebSocket 연결을 중단합니다.');
+    }
   }
 
   /// 연결 해제 시 호출
