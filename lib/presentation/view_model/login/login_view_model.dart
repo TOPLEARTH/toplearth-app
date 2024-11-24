@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -6,9 +7,9 @@ import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/condition/auth/login_by_apple_condition.dart';
 import 'package:toplearth/domain/condition/auth/login_by_default_condition.dart';
 import 'package:toplearth/domain/condition/auth/login_by_kakao_condition.dart';
-import 'package:toplearth/domain/usecase/login_by_apple_usecase.dart';
-import 'package:toplearth/domain/usecase/login_by_default_usecase.dart';
-import 'package:toplearth/domain/usecase/login_by_kakao_usecase.dart';
+import 'package:toplearth/domain/usecase/auth/login_by_apple_usecase.dart';
+import 'package:toplearth/domain/usecase/auth/login_by_default_usecase.dart';
+import 'package:toplearth/domain/usecase/auth/login_by_kakao_usecase.dart';
 import 'package:toplearth/app/utility/log_util.dart';
 
 class LoginViewModel extends GetxController {
@@ -99,17 +100,39 @@ class LoginViewModel extends GetxController {
     _isEnableGreyBarrier.value = true;
 
     try {
+      // 1. Kakao Access Token 획득 시도 로깅
+      debugPrint('🔍 Attempting to fetch Kakao Access Token...');
       final kakaoAccessToken = await _fetchKakaoAccessToken();
+      debugPrint('✅ Kakao Access Token received: ${kakaoAccessToken.substring(0, 10)}...');
 
+      // 2. 서버 로그인 시도 전 로깅
+      debugPrint('🔍 Attempting server login with Kakao token...');
       StateWrapper<void> result = await _loginByKakaoUsecase.execute(
         LoginByKakaoCondition(kakaoAccessToken: kakaoAccessToken),
       );
 
+      // 3. 결과 상세 로깅
+      debugPrint('📋 Login Result:');
+      debugPrint('Success: ${result.success}');
+      debugPrint('Message: ${result.message}');
+
       _isEnableGreyBarrier.value = false;
       return ResultWrapper(success: result.success, message: result.message);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // 4. 상세한 에러 로깅
+      debugPrint('❌ Kakao Login Error:');
+      debugPrint('Error Type: ${e.runtimeType}');
+      debugPrint('Error Message: $e');
+      debugPrint('Stack Trace: $stackTrace');
+
       _isEnableGreyBarrier.value = false;
-      return ResultWrapper(success: false, message: '카카오 로그인 실패: $e');
+      return ResultWrapper(
+          success: false,
+          message: '카카오 로그인 실패: ${e.toString()}'
+      );
+    } finally {
+      // 5. Grey Barrier 상태 로깅
+      debugPrint('🔒 Grey Barrier disabled');
     }
   }
 
@@ -142,7 +165,9 @@ class LoginViewModel extends GetxController {
       token = await UserApi.instance.loginWithKakaoAccount();
     }
 
-    LogUtil.info('Kakao Access Token: ${token.accessToken}');
+    debugPrint('sibal token: ${token}');
+
+    // LogUtil.info('Kakao Access Token: ${token.accessToken}');
     return token.accessToken;
   }
 

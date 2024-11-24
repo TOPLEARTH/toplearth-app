@@ -4,7 +4,7 @@ import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/entity/user/user_state.dart';
 import 'package:toplearth/domain/repository/user/user_repository.dart';
-import 'package:toplearth/domain/usecase/read_user_state_usecase.dart';
+import 'package:toplearth/domain/usecase/user/read_user_state_usecase.dart';
 
 class RootViewModel extends GetxController {
   /* ------------------------------------------------------ */
