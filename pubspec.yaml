@@ -42,6 +42,9 @@ dependencies:
   # Extended Nested Scroll View
   extended_nested_scroll_view: ^6.2.1
 
+  # debounce_throttle
+  debounce_throttle: ^2.0.0
+
   # model_viewer_plus
   model_viewer_plus: ^1.9.0
 
