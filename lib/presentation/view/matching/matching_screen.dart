@@ -7,6 +7,7 @@ import 'package:toplearth/domain/type/e_group_status.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
+import 'package:toplearth/presentation/widget/dialog/group_request_dialog.dart';
 import 'package:toplearth/presentation/widget/image/png_image_view.dart';
 
 class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
@@ -63,7 +64,7 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
           text: '그룹 설정하기',
           onPressed: () {
             // Trigger group setup dialog
-            Get.snackbar('Info', '그룹 설정을 시작하세요!');
+            Get.dialog(GroupRequestDialog());
           },
         ),
       ],

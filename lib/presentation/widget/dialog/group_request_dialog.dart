@@ -32,15 +32,6 @@ class GroupRequestDialog extends StatelessWidget {
               style: FontSystem.Sub2,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
-            RoundedRectangleTextButton(
-              text: '그룹 완료하면 테스트 🌏',
-              textStyle: FontSystem.Sub2.copyWith(color: Colors.white),
-              backgroundColor: ColorSystem.main,
-              onPressed: () {
-                Get.toNamed(AppRoutes.GROUP_CREATE_COMPLETE);
-              },
-            ),
             const SizedBox(height: 8),
             RoundedRectangleTextButton(
               text: '그룹 생성하기 🌏',
