@@ -7,10 +7,10 @@ import 'package:toplearth/data/provider/user/user_remote_provider.dart';
 import 'package:toplearth/data/provider/user/user_remote_provider_impl.dart';
 import 'package:toplearth/data/repository/auth_repository_impl.dart';
 import 'package:toplearth/data/repository/group_repository_impl.dart';
+import 'package:toplearth/data/repository/user_repository_impl.dart';
 import 'package:toplearth/domain/repository/auth/auth_repository.dart';
 import 'package:toplearth/domain/repository/group/group_repository.dart';
 import 'package:toplearth/domain/repository/user/user_repository.dart';
-import 'package:toplearth/domain/repository/user/user_repository_impl.dart';
 
 class AppDependency extends Bindings {
   @override

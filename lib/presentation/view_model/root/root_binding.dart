@@ -18,8 +18,8 @@ class RootBinding extends Bindings {
     GroupBinding().dependencies();
     StoreBinding().dependencies();
     PloggingBinding().dependencies();
-    Get.lazyPut<ReadUserStateUsecase>(
-      () => ReadUserStateUsecase(),
+    Get.lazyPut<ReadBootStrapUseCase>(
+      () => ReadBootStrapUseCase(),
     );
   }
 }

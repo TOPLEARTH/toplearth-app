@@ -165,8 +165,6 @@ class LoginViewModel extends GetxController {
       token = await UserApi.instance.loginWithKakaoAccount();
     }
 
-    debugPrint('sibal token: ${token}');
-
     // LogUtil.info('Kakao Access Token: ${token.accessToken}');
     return token.accessToken;
   }
