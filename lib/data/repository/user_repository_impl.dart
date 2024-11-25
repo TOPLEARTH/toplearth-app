@@ -1,10 +1,8 @@
-
-
 import 'package:get/get.dart';
 import 'package:toplearth/core/wrapper/response_wrapper.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/data/provider/user/user_remote_provider.dart';
-import 'package:toplearth/domain/entity/user/user_state.dart';
+import 'package:toplearth/domain/entity/user/boot_strap_state.dart';
 import 'package:toplearth/domain/repository/user/user_repository.dart';
 
 class UserRepositoryImpl extends GetxService implements UserRepository {
@@ -13,27 +11,29 @@ class UserRepositoryImpl extends GetxService implements UserRepository {
   @override
   void onInit() {
     super.onInit();
+
     _userRemoteProvider = Get.find<UserRemoteProvider>();
   }
 
   @override
-  Future<StateWrapper<UserState>> readUserState() async {
-    ResponseWrapper response = await _userRemoteProvider.getUserInformation();
+  Future<StateWrapper<BootstrapState>> readBootStrapData() async {
+    ResponseWrapper response = await _userRemoteProvider.getBootStrapInformation();
 
-    StateWrapper<UserState> state;
+    StateWrapper<BootstrapState> state;
 
-    if(response.success){
-      state = StateWrapper<UserState>(
+    if (response.success) {
+      state = StateWrapper<BootstrapState>(
         success: response.success,
         message: response.message,
-        data: UserState.fromJson(response.data!),
+        data: BootstrapState.fromJson(response.data!),
       );
     } else {
-      state = StateWrapper<UserState>(
+      state = StateWrapper<BootstrapState>(
         success: response.success,
         message: response.message,
       );
     }
+
     return state;
   }
 }

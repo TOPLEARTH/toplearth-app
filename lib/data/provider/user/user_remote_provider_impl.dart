@@ -5,7 +5,7 @@ import 'package:toplearth/data/provider/user/user_remote_provider.dart'; // FCM 
 
 class UserRemoteProviderImpl extends BaseConnect implements UserRemoteProvider {
   @override
-  Future<ResponseWrapper> getUserInformation() async {
+  Future<ResponseWrapper> getBootStrapInformation() async {
     Response response = await get(
       '/api/v1/bootstrap',
       headers: BaseConnect.usedAuthorization,

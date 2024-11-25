@@ -23,7 +23,6 @@ class LoginByKakaoUseCase extends BaseUseCase
     StateWrapper<Map<String, dynamic>> state =
         await _authRepository.loginByKakao(condition);
 
-    debugPrint('state: $state');
 
     // If login failed, Guard Clause
     if (!state.success) {

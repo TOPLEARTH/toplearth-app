@@ -7,7 +7,7 @@ import 'package:toplearth/domain/condition/group/search_group_condition.dart';
 import 'package:toplearth/domain/condition/group/update_group_name_condition.dart';
 import 'package:toplearth/domain/entity/group/group_brief_state.dart';
 import 'package:toplearth/domain/entity/group/group_create_state.dart';
-import 'package:toplearth/domain/entity/group/group_detail_state.dart';
+import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/domain/entity/group/group_name_state.dart';
 
 abstract class GroupRepository {
@@ -19,7 +19,7 @@ abstract class GroupRepository {
       JoinGroupCondition condition,
       );
 
-  Future<StateWrapper<GroupDetailState>> getGroupDetail();
+  Future<StateWrapper<TeamInfoState>> getGroupDetail();
 
   Future<StateWrapper<List<GroupBriefState>>> searchGroup(
       SearchGroupCondition condition,
