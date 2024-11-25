@@ -35,7 +35,7 @@ class HomeScreen extends BaseScreen<HomeViewModel> {
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          HomeUserInfoView(),
+          // HomeUserInfoView(),
           HomeMapSwitcherView(),
         ],
       ),
