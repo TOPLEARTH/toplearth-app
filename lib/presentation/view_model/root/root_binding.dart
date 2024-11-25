@@ -4,6 +4,7 @@ import 'package:toplearth/presentation/view_model/group/group_binding.dart';
 import 'package:toplearth/presentation/view_model/home/home_binding.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_group_binding.dart';
 import 'package:toplearth/presentation/view_model/my_page/matching_binding.dart';
+import 'package:toplearth/presentation/view_model/plogging/plogging_binding.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/view_model/store/store_binding.dart';
 
@@ -16,9 +17,9 @@ class RootBinding extends Bindings {
     HomeBinding().dependencies();
     GroupBinding().dependencies();
     StoreBinding().dependencies();
-
+    PloggingBinding().dependencies();
     Get.lazyPut<ReadUserStateUsecase>(
-          () => ReadUserStateUsecase(),
+      () => ReadUserStateUsecase(),
     );
   }
 }
