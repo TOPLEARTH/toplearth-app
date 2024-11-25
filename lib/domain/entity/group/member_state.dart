@@ -25,21 +25,12 @@ class MemberState {
     );
   }
 
-  MemberState initial() {
-    return MemberState(
-      id: 0,
-      name: '',
-      role: '',
-      distance: 0.0,
-    );
-  }
-
   factory MemberState.fromJson(Map<String, dynamic> json) {
     return MemberState(
-      id: json['id'],
-      name: json['name'],
-      role: json['role'],
-      distance: (json['distance'] as num).toDouble(),
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      role: json['role'] ?? '',
+      distance: (json['distance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }
