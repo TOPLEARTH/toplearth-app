@@ -22,6 +22,7 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
 
   @override
   Widget buildBody(BuildContext context) {
+
     return Obx(
       () => Stack(
         children: [
@@ -38,6 +39,7 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
     );
   }
 
+
   _buildFloatingActionButton(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -45,6 +47,7 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
       children: [
         const SizedBox(height: 10),
         FloatingActionButton(
+          heroTag: 'zoom_in_plogging_screen',
           onPressed: () => viewModel.moveToCurrentLocation(),
           backgroundColor: viewModel.isFollowingLocation.value
               ? ColorSystem.main
@@ -52,6 +55,7 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
           child: const Icon(Icons.location_on),
         ),
         FloatingActionButton(
+          heroTag: 'zoom_out_plogging_screen',
           onPressed: () => viewModel.toggleTrashBins(),
           backgroundColor:
               viewModel.showTrashBins.value ? ColorSystem.main : Colors.grey,
@@ -60,7 +64,7 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
               : Icons.delete_outline_outlined),
         ),
         FloatingActionButton(
-          heroTag: "add_marker",
+          heroTag: "add_marker_plogging_screen",
           onPressed: () => viewModel.addMarkerAtCurrentLocation(),
           backgroundColor: ColorSystem.main,
           child: const Icon(Icons.add_location),
@@ -78,4 +82,5 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
       ],
     );
   }
+
 }

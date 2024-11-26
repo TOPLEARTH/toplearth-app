@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'dart:math' as math;
+import 'package:health/health.dart';
 class PloggingController extends GetxController {
   // Map Controller
   late NaverMapController _mapController;
@@ -204,6 +205,8 @@ class PloggingController extends GetxController {
     );
   }
 
+  final HealthFactory health = HealthFactory();
+
   String _formatDuration(Duration duration) {
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
@@ -244,11 +247,13 @@ class NaverMapScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           FloatingActionButton(
+            heroTag: 'zoom_in',
             onPressed: () => controller.zoomIn(),
             child: const Icon(Icons.zoom_in),
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
+            heroTag: 'zoom_out',
             onPressed: () => controller.zoomOut(),
             child: const Icon(Icons.zoom_out),
           ),
@@ -258,6 +263,7 @@ class NaverMapScreen extends StatelessWidget {
               onPressed: controller.isTracking.value
                   ? () => controller.stopPlogging()
                   : () => controller.startPlogging(),
+              heroTag: 'start_stop',
               label: Text(controller.isTracking.value ? "Stop Plogging" : "Start Plogging"),
               icon: Icon(controller.isTracking.value ? Icons.stop : Icons.play_arrow),
             ),
