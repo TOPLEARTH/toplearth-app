@@ -3,11 +3,13 @@ import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/entity/group/member_state.dart';
 import 'package:toplearth/domain/entity/group/label_state.dart';
+import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/presentation/view_model/group/group_view_model.dart';
 
 // 뷰모델 익히기용
 class GroupScreen extends BaseWidget<GroupViewModel> {
   const GroupScreen({super.key});
+
 
   @override
   Widget buildView(BuildContext context) {

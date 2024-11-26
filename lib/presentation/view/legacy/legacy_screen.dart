@@ -3,57 +3,46 @@ import 'package:get/get.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
+import 'package:toplearth/domain/entity/global/legacy_info_state.dart';
+import 'package:toplearth/presentation/view_model/legacy/legacy_view_model.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_back_app_bar.dart';
 import 'package:toplearth/presentation/widget/image/png_image_view.dart';
 
 
-class LegacyScreen extends BaseScreen<RootViewModel> {
+class LegacyScreen extends BaseScreen<LegacyViewModel> {
   const LegacyScreen({super.key});
+
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) {
     return const DefaultBackAppBar();
   }
 
+
   @override
   Widget buildBody(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Obx(() {
-        final legacyInfo = controller.legacyInfoState;
-        final trashInfo = legacyInfo.trashInfo;
+   int totalTrashCnt = viewModel.legacyInfoState.totalTrashCnt;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('총 사용자 수: ${legacyInfo.totalUserCnt}',
-                style: TextStyle(fontSize: 16)),
-            Text('총 쓰레기 수: ${legacyInfo.totalTrashCnt}',
-                style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 16),
-            Text('Trash Info:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text('Plastic: ${trashInfo.plastic}',
-                style: TextStyle(fontSize: 16)),
-            Text('Food Waste: ${trashInfo.foodWaste}',
-                style: TextStyle(fontSize: 16)),
-            Text('Glass Bottle: ${trashInfo.glassBottle}',
-                style: TextStyle(fontSize: 16)),
-            Text('Cigarette Butt: ${trashInfo.cigaretteButt}',
-                style: TextStyle(fontSize: 16)),
-            Text('Paper: ${trashInfo.paper}', style: TextStyle(fontSize: 16)),
-            Text('Disposable Container: ${trashInfo.disposableContainer}',
-                style: TextStyle(fontSize: 16)),
-            Text('Can: ${trashInfo.can}', style: TextStyle(fontSize: 16)),
-            Text('Plastic Bag: ${trashInfo.plasticBag}',
-                style: TextStyle(fontSize: 16)),
-            Text('Others: ${trashInfo.others}', style: TextStyle(fontSize: 16)),
-          ],
-        );
-      }),
+    debugPrint('debug: $totalTrashCnt');
+    return Column(
+      children: [
+        // _buildTotalTrashSection(context),
+        const SizedBox(height: 24),
+        // _buildTotalUsersSection(context),
+      ],
     );
   }
+
+  // @override
+  // Widget buildBody(BuildContext context) {
+  //   LegacyInfoState legacyInfoState = viewModel.legacyInfoState;
+  //
+  //   debugPrint('debug: ${legacyInfoState.totalTrashCnt}');
+  //   return Column(
+  //
+  //   );
+  // }
 }
 
 

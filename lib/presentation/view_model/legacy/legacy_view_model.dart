@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/domain/entity/global/legacy_info_state.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
@@ -27,5 +28,7 @@ class LegacyViewModel extends GetxController {
 
     // Private Fields 초기화
     _legacyInfoState = _rootViewModel.legacyInfoState.obs;
+
+    debugPrint('debug in legacyViewModel: ${_legacyInfoState.value.totalTrashCnt}');
   }
 }

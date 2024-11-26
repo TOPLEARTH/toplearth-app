@@ -21,7 +21,7 @@ class MatchingGroupSearchViewModel extends GetxController {
 
   // Debouncer for handling search input
   final Debouncer<String> debouncer = Debouncer<String>(
-    Duration(seconds: 1), // Debounce duration: 1 second
+    const Duration(seconds: 1), // Debounce duration: 1 second
     initialValue: '',
   );
 

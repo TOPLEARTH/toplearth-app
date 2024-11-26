@@ -1,16 +1,20 @@
 import 'dart:core';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/entity/global/legacy_info_state.dart';
 import 'package:toplearth/domain/entity/global/region_ranking_info_state.dart';
+import 'package:toplearth/domain/entity/global/region_ranking_state.dart';
 import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_info_state.dart';
+import 'package:toplearth/domain/entity/plogging/team_info_state.dart';
 import 'package:toplearth/domain/entity/quest/quest_info_state.dart';
 import 'package:toplearth/domain/entity/user/boot_strap_state.dart';
 import 'package:toplearth/domain/entity/user/user_state.dart';
+import 'package:toplearth/domain/repository/user/user_repository.dart';
 import 'package:toplearth/domain/usecase/user/read_user_state_usecase.dart';
 
 class RootViewModel extends GetxController {
@@ -47,8 +51,9 @@ class RootViewModel extends GetxController {
   TeamInfoState get teamInfoState => _teamInfoState.value;
   PloggingInfoState get ploggingInfoState => _ploggingInfoState.value;
   LegacyInfoState get legacyInfoState => _legacyInfoState.value;
-  RegionRankingInfoState get regionRankingInfoState =>
-      _regionRankingInfoState.value;
+  RegionRankingInfoState get regionRankingInfoState => _regionRankingInfoState.value;
+
+  RxBool isBootstrapLoaded = false.obs;
 
   @override
   void onInit() async {
@@ -82,9 +87,10 @@ class RootViewModel extends GetxController {
 
   @override
   void onReady() async {
+    _fetchBootstrapInformation();
     super.onReady();
 
-    _fetchBootstrapInformation();
+
   }
 
   void _fetchBootstrapInformation() async {
@@ -97,6 +103,13 @@ class RootViewModel extends GetxController {
       _ploggingInfoState.value = state.data!.ploggingInfo;
       _legacyInfoState.value = state.data!.legacyInfo;
       _regionRankingInfoState.value = state.data!.regionRankingInfo;
+
+      debugPrint('userState: ${_userState.value.nickname}');
+
+      debugPrint('legacyInfoState: ${_legacyInfoState.value.totalTrashCnt}');
+
+      isBootstrapLoaded.value = true; // 로드 완료 상태 업데이트
     }
+    debugPrint('isBootstrapLoaded: ${isBootstrapLoaded.value}');
   }
 }
