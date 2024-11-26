@@ -1,42 +1,51 @@
 class QuestState {
-  final int questId;
-  final String title;
-  final int target;
-  final int questCredit;
-  final int currentProgress;
-  final bool isCompleted;
-  final int progressRate;
+  final double? targetKmName;
+  final int? targetPickNumber;
+  final int? targetLabelNumber;
+  final double? myKmNumber;
+  final int? myPickNumber;
+  final int? myLabelNumber;
   final String createdAt;
-  final String? completedAt;
 
   QuestState({
-    required this.questId,
-    required this.title,
-    required this.target,
-    required this.questCredit,
-    required this.currentProgress,
-    required this.isCompleted,
-    required this.progressRate,
+    this.targetKmName,
+    this.targetPickNumber,
+    this.targetLabelNumber,
+    this.myKmNumber,
+    this.myPickNumber,
+    this.myLabelNumber,
     required this.createdAt,
-    this.completedAt,
   });
 
   factory QuestState.fromJson(Map<String, dynamic> json) {
     return QuestState(
-      questId: int.tryParse(json['questId']?.toString() ?? '0') ?? 0,
-      title: json['title'] ?? '',
-      target: int.tryParse(json['target']?.toString() ?? '0') ?? 0,
-      questCredit: int.tryParse(json['questCredit']?.toString() ?? '0') ?? 0,
-      currentProgress: int.tryParse(json['currentProgress']?.toString() ?? '0') ?? 0,
-      isCompleted: json['isCompleted'] ?? false,
-      progressRate: int.tryParse(json['progressRate']?.toString() ?? '0') ?? 0,
+      targetKmName: (json['targetKmName'] != null)
+          ? double.tryParse(json['targetKmName'].toString())
+          : null,
+      targetPickNumber: json['targetPickNumber'] as int?,
+      targetLabelNumber: json['targetLabelNumber'] as int?,
+      myKmNumber: (json['myKmNumber'] != null)
+          ? double.tryParse(json['myKmNumber'].toString())
+          : null,
+      myPickNumber: json['myPickNumber'] as int?,
+      myLabelNumber: json['myLabelNumber'] as int?,
       createdAt: json['createdAt'] ?? '',
-      completedAt: json['completedAt'], // nullable, 그대로 사용
     );
   }
 
+  /// Static initial value
+  static QuestState get initial => QuestState(
+        targetKmName: null,
+        targetPickNumber: null,
+        targetLabelNumber: null,
+        myKmNumber: null,
+        myPickNumber: null,
+        myLabelNumber: null,
+        createdAt: '', // Default empty string for createdAt
+      );
+
   @override
   String toString() {
-    return 'QuestState(questId: $questId, title: $title, target: $target, questCredit: $questCredit, currentProgress: $currentProgress, isCompleted: $isCompleted, progressRate: $progressRate, createdAt: $createdAt, completedAt: $completedAt)';
+    return 'QuestState(targetKmName: $targetKmName, targetPickNumber: $targetPickNumber, targetLabelNumber: $targetLabelNumber, myKmNumber: $myKmNumber, myPickNumber: $myPickNumber, myLabelNumber: $myLabelNumber, createdAt: $createdAt)';
   }
 }

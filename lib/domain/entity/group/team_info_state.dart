@@ -1,3 +1,4 @@
+import 'package:toplearth/domain/entity/group/member_state.dart';
 import 'package:toplearth/domain/entity/group/monthly_group_state.dart';
 
 class TeamInfoState {
@@ -6,6 +7,7 @@ class TeamInfoState {
   final String teamCode;
   final int matchCnt;
   final int winCnt;
+  final List<MemberState> teamMemebers;
   final Map<String, MonthlyGroupState> monthlyData;
 
   TeamInfoState({
@@ -14,6 +16,7 @@ class TeamInfoState {
     required this.teamCode,
     required this.matchCnt,
     required this.winCnt,
+    required this.teamMemebers,
     required this.monthlyData,
   });
 
@@ -23,6 +26,7 @@ class TeamInfoState {
     String? teamCode,
     int? matchCnt,
     int? winCnt,
+    List<MemberState>? teamMemebers,
     Map<String, MonthlyGroupState>? monthlyData,
   }) {
     return TeamInfoState(
@@ -31,6 +35,7 @@ class TeamInfoState {
       teamCode: teamCode ?? this.teamCode,
       matchCnt: matchCnt ?? this.matchCnt,
       winCnt: winCnt ?? this.winCnt,
+      teamMemebers: teamMemebers ?? this.teamMemebers,
       monthlyData: monthlyData ?? this.monthlyData,
     );
   }
@@ -42,6 +47,7 @@ class TeamInfoState {
       teamCode: '',
       matchCnt: 0,
       winCnt: 0,
+      teamMemebers: [],
       monthlyData: {},
     );
   }
@@ -53,8 +59,15 @@ class TeamInfoState {
       teamCode: json['teamCode'],
       matchCnt: json['matchCnt'],
       winCnt: json['winCnt'],
+      teamMemebers: (json['teamMemebers'] as List<dynamic>?)
+              ?.map(
+                (member) =>
+                    MemberState.fromJson(member as Map<String, dynamic>),
+              )
+              .toList() ??
+          [],
       monthlyData: (json['monthlyData'] as Map<String, dynamic>).map(
-            (month, data) => MapEntry(
+        (month, data) => MapEntry(
           month,
           MonthlyGroupState.fromJson(data),
         ),
@@ -64,6 +77,8 @@ class TeamInfoState {
 
   @override
   String toString() {
-    return 'TeamInfoState(teamId: $teamId, teamName: $teamName, teamCode: $teamCode, matchCnt: $matchCnt, winCnt: $winCnt, monthlyData: $monthlyData)';
+    return 'TeamInfoState(teamId: $teamId, teamName: $teamName, '
+        'teamCode: $teamCode, matchCnt: $matchCnt, winCnt: $winCnt, '
+        'teamMemebers: $teamMemebers, monthlyData: $monthlyData)';
   }
 }
