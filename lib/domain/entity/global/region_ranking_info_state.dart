@@ -22,12 +22,9 @@ class RegionRankingInfoState {
   }
 
 
-  factory RegionRankingInfoState.fromJson(Map<String, dynamic> json) {
+  factory RegionRankingInfoState.fromJson(List<dynamic> json) {
     return RegionRankingInfoState(
-      regionRankingInfo: (json['regionRankingInfo'] as List<dynamic>?)
-          ?.map((region) => RegionRankingState.fromJson(region))
-          .toList() ??
-          [],
+      regionRankingInfo: json.map((regionRanking) => RegionRankingState.fromJson(regionRanking)).toList(),
     );
   }
 }

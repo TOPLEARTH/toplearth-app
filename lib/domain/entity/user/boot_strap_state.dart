@@ -70,12 +70,12 @@ class BootstrapState {
 
   factory BootstrapState.fromJson(Map<String, dynamic> json) {
     return BootstrapState(
-      userInfo: json['userInfo'],
-      questInfo: json['questInfo'],
-      teamInfo: json['teamInfo'],
-      ploggingInfo: json['ploggingInfo'],
-      legacyInfo: json['legacyInfo'],
-      regionRankingInfo: json['regionRankingInfo'],
+      userInfo: UserState.fromJson(json['userInfo']),
+      questInfo: QuestInfoState.fromJson(json['questInfo']),
+      teamInfo: TeamInfoState.fromJson(json['teamInfo']),
+      ploggingInfo: PloggingInfoState.fromJson(json['ploggingInfo']),
+      legacyInfo: LegacyInfoState.fromJson(json['legacyInfo']),
+      regionRankingInfo: RegionRankingInfoState.fromJson(json['regionRankingInfo']),
     );
   }
 
