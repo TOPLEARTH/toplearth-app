@@ -12,14 +12,22 @@ class MonthlyGroupState {
 
   factory MonthlyGroupState.fromJson(Map<String, dynamic> json) {
     return MonthlyGroupState(
-      members: (json['monthlyData']?['2024-12']?['distances'] as List<dynamic>?)
+      // Parse distances into MemberState list
+      members: (json['distances'] as List<dynamic>?)
               ?.map((member) => MemberState.fromJson(member))
               .toList() ??
           [],
-      labels: (json['monthlyData']?['2024-12']?['labels'] as List<dynamic>?)
+
+      // Parse labels into LabelState list
+      labels: (json['labels'] as List<dynamic>?)
               ?.map((label) => LabelState.fromJson(label))
               .toList() ??
           [],
     );
+  }
+
+  @override
+  String toString() {
+    return 'MonthlyGroupState(members: $members, labels: $labels)';
   }
 }

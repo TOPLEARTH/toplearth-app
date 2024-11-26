@@ -66,12 +66,13 @@ class TeamInfoState {
               )
               .toList() ??
           [],
-      monthlyData: (json['monthlyData'] as Map<String, dynamic>).map(
-        (month, data) => MapEntry(
-          month,
-          MonthlyGroupState.fromJson(data),
-        ),
-      ),
+      monthlyData: (json['monthlyData'] as Map<String, dynamic>?)?.map(
+            (month, data) => MapEntry(
+              month,
+              MonthlyGroupState.fromJson(data as Map<String, dynamic>),
+            ),
+          ) ??
+          {},
     );
   }
 
