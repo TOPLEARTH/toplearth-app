@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/domain/entity/group/monthly_group_state.dart';
+import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 
 class GroupViewModel extends GetxController {
@@ -21,7 +21,8 @@ class GroupViewModel extends GetxController {
   TeamInfoState get teamInfoState => _teamInfoState.value;
 
   MonthlyGroupState? get currentMonthData {
-    final currentMonth = DateTime.now().toIso8601String().substring(0, 7); // e.g., "2024-12"
+    final currentMonth =
+        DateTime.now().toIso8601String().substring(0, 7); // e.g., "2024-12"
     return teamInfoState.monthlyData[currentMonth];
   }
 
@@ -39,8 +40,9 @@ class GroupViewModel extends GetxController {
     ever(_rootViewModel.isBootstrapLoaded, (isLoaded) {
       if (isLoaded) {
         // Bootstrap 데이터가 로드된 이후 업데이트
-        _teamInfoState.value = _rootViewModel.teamInfoState;
+        _teamInfoState.value = _rootViewModel.teamInfoState; //2
         debugPrint('debug in groupViewModel: ${teamInfoState.teamName}');
+        debugPrint('debug in groupViewModel: ${teamInfoState.teamCode}');
       }
     });
   }
