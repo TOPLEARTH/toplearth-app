@@ -7,7 +7,7 @@ import 'package:toplearth/presentation/view/matching/matching_screen.dart';
 import 'package:toplearth/presentation/view/my_page/my_page_screen.dart';
 import 'package:toplearth/presentation/view/root/widget/custom_bottom_navigation_bar/custom_bottom_navigation_bar.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
-import 'package:toplearth/test_code/plogging_screen.dart';
+import 'package:toplearth/presentation/view/plogging/plogging_screen.dart';
 
 class RootScreen extends BaseScreen<RootViewModel> {
   const RootScreen({super.key});

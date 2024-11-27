@@ -69,6 +69,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 GestureDetector(
                   onTap: () {
+                    Get.toNamed(AppRoutes.TEST_CODE);
                     LogUtil.info('Setting button tapped');
                     // Get.toNamed(AppRoutes.APP_SETTING); // 알림 화면 이동
                   },
