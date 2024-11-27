@@ -16,13 +16,12 @@ class RootBinding extends Bindings {
     Get.lazyPut<ReadBootStrapUseCase>(
           () => ReadBootStrapUseCase(),
     );
+    PloggingBinding().dependencies();
     MyPageBinding().dependencies();
     MatchingGroupBinding().dependencies();
     HomeBinding().dependencies();
     StoreBinding().dependencies();
     GroupBinding().dependencies();
     LegacyBinding().dependencies();
-    PloggingBinding().dependencies();
   }
-
 }
