@@ -1,22 +1,65 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-
+import 'package:screenshot/screenshot.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/font_system.dart';
-import 'package:toplearth/test_code/plogging_path_painter.dart';
+import 'package:toplearth/core/wrapper/state_wrapper.dart';
+import 'package:toplearth/domain/condition/plogging/finish_plogging_condition.dart';
+import 'package:toplearth/domain/condition/plogging/plogging_labeling_condition.dart';
+import 'package:toplearth/domain/condition/plogging/start_individual_plogging_condition.dart';
+import 'package:toplearth/domain/entity/plogging/plogging_finish_state.dart';
+import 'package:toplearth/domain/entity/plogging/plogging_image_list_state.dart';
+import 'package:toplearth/domain/entity/plogging/plogging_start_individual_state.dart';
+import 'package:toplearth/domain/type/e_labeling_status.dart';
+import 'package:toplearth/domain/usecase/plogging/finish_plogging_usecase.dart';
+import 'package:toplearth/domain/usecase/plogging/labeling_plogging_usecase.dart';
+import 'package:toplearth/domain/usecase/plogging/start_individual_plogging_usecase.dart';
+import 'package:toplearth/presentation/view/plogging/plogging_path_painter.dart';
+import 'dart:io';
+import 'package:get/get.dart';
+import 'package:toplearth/core/wrapper/result_wrapper.dart';
+import 'package:toplearth/domain/condition/plogging/upload_plogging_image_condition.dart';
+import 'package:toplearth/domain/usecase/plogging/upload_plogging_image_usecase.dart';
+import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
+import 'dart:typed_data';
 
 class PloggingViewModel extends GetxController {
+  /* ------------------------------------------------------ */
+  /* DI Fields -------------------------------------------- */
+  /* ------------------------------------------------------ */
+  late final UploadPloggingImageUseCase _uploadPloggingImageUseCase;
+  late final StartIndividualPloggingUseCase _startIndividualPloggingUseCase;
+  late final FinishPloggingUseCase _finishPloggingUsecase;
+  late final LabelingPloggingUseCase _labelingPloggingUseCase;
+  late final RootViewModel _rootViewModel;
+  final Rx<PloggingImageListState> _ploggingImageListState =
+      PloggingImageListState(ploggingImages: []).obs;
+  // ScreenshotController 추가
+  final ScreenshotController screenshotController = ScreenshotController();
   /* ------------------------------------------------------ */
   /* Private Fields --------------------------------------- */
   /* ------------------------------------------------------ */
   late NaverMapController _mapController;
   Timer? _timer;
   NLatLng? _currentLocation;
+  final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxBool isLoading = false.obs;
+  //regionId
+  late int regionId;
+  // ploggingId
+  late int ploggingId;
+
+  // dummy data
+  final double distance = 5.5; // km
+  final int duration = 3600; // 초
+  final int pickUpCnt = 15; // 수거 갯수
+  final int burnedCalories = 200; // 칼로리
+  final Rx<File?> ploggingImage = File('assets/images/test_image.jpg').obs;
 
   /* ------------------------------------------------------ */
   /* Observable Fields ------------------------------------ */
@@ -38,13 +81,157 @@ class PloggingViewModel extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // RootViewModel 인스턴스 가져오기
+    _rootViewModel = Get.find<RootViewModel>();
     _checkLocationPermission();
+    _uploadPloggingImageUseCase = Get.find<UploadPloggingImageUseCase>();
+    _startIndividualPloggingUseCase =
+        Get.find<StartIndividualPloggingUseCase>();
+    _finishPloggingUsecase = Get.find<FinishPloggingUseCase>();
+    _labelingPloggingUseCase = Get.find<LabelingPloggingUseCase>();
+
+    ever(_rootViewModel.regionId, (int newRegionId) {
+      regionId = newRegionId;
+      debugPrint("Updated regionId in PloggingViewModel: $regionId");
+    });
   }
 
   @override
   void onClose() {
     _positionStreamSubscription.cancel();
     super.onClose();
+  }
+
+  void setSelectedImage(File? image) {
+    selectedImage.value = image;
+  }
+
+  Future<ResultWrapper> startIndividualPlogging() async {
+    StateWrapper<PloggingStartIndividualState> state =
+        await _startIndividualPloggingUseCase
+            .execute(StartIndividualPloggingCondition(regionId: regionId));
+    ploggingId = state.data!.ploggingId;
+
+    return ResultWrapper(
+      success: state.success,
+      message: state.message,
+    );
+  }
+
+  // Future<ResultWrapper> startTeamPlogging(int regionId) async {
+  //   StateWrapper<void> state = await _startIndividualPloggingUseCase
+  //       .execute(StartIndividualPloggingCondition(regionId: regionId));
+  //
+  //   return ResultWrapper(
+  //     success: state.success,
+  //     message: state.message,
+  //   );
+  // }
+
+  Future<ResultWrapper> finishPlogging() async {
+    // 플로깅 종료 API 호출
+    StateWrapper<PloggingImageListState> state =
+        await _finishPloggingUsecase.execute(FinishPloggingCondition(
+      ploggingId: ploggingId,
+      ploggingData: PloggingFinishState(
+        distance: distance,
+        duration: duration,
+        pickUpCnt: pickUpCnt,
+        burnedCalories: burnedCalories,
+      ),
+    ));
+    // 상태 업데이트
+    if (state.success && state.data != null) {
+      _ploggingImageListState.value = state.data!; // 상태 업데이트
+      debugPrint(
+          'FinishPlogging Response Data: ${state.data!.ploggingImages.first}');
+      for (var image in _ploggingImageListState.value.ploggingImages) {
+        debugPrint(
+            'Image ID: ${image.ploggingImageId}, URL: ${image.imageUrl}');
+      }
+    } else {
+      debugPrint('FinishPlogging Failed: ${state.message}');
+    }
+
+    return ResultWrapper(
+      success: state.success,
+      message: state.message,
+    );
+  }
+
+
+  Future<ResultWrapper> labelingPloggingImages() async {
+    if (ploggingImage.value == null) {
+      return ResultWrapper(
+        success: false,
+        message: '캡처된 이미지가 없습니다.',
+      );
+    }
+
+    // 이미지 ID 리스트와 라벨 리스트 매핑
+    final List<int> imageIds = _ploggingImageListState.value.ploggingImages
+        .map((e) => e.ploggingImageId!)
+        .toList();
+
+    // 예시: 모든 이미지에 동일한 라벨링 처리 (실제는 동적 구성 가능)
+    final List<String> labels = List.generate(
+        imageIds.length, (_) => ELabelingStatus.plastic.toString());
+
+    // 리스트 크기 확인
+    if (imageIds.length != labels.length) {
+      return ResultWrapper(
+        success: false,
+        message: '이미지 ID와 라벨 리스트의 크기가 일치하지 않습니다.',
+      );
+    }
+    try {
+      StateWrapper<void> state = await _labelingPloggingUseCase.execute(
+        PloggingLabelingCondition(
+          ploggingId: ploggingId,
+          ploggingImage: ploggingImage.value!, // 캡처된 이미지
+          ploggingImageIds: imageIds,
+          labels: labels,
+        ),
+      );
+
+      if (!state.success) {
+        return ResultWrapper(
+          success: false,
+          message: state.message,
+        );
+      }
+
+      return ResultWrapper(
+        success: true,
+        message: '라벨링이 성공적으로 처리되었습니다.',
+      );
+    } catch (e) {
+      return ResultWrapper(
+        success: false,
+        message: '라벨링 처리 중 오류 발생: $e',
+      );
+    }
+  }
+
+  Future<ResultWrapper> uploadImage(double latitude, double longitude) async {
+    if (selectedImage.value == null) {
+      return ResultWrapper(success: false, message: '이미지를 선택해주세요.');
+    }
+    isLoading.value = true;
+    StateWrapper<void> state = await _uploadPloggingImageUseCase.execute(
+      UploadPloggingImageCondition(
+        ploddingImage: selectedImage.value!,
+        ploggingId: ploggingId,
+        latitude: latitude,
+        longitude: longitude,
+      ),
+    );
+    isLoading.value = false;
+
+    return ResultWrapper(
+      success: state.success,
+      message: state.message,
+    );
   }
 
   Future<void> _checkLocationPermission() async {
@@ -69,6 +256,25 @@ class PloggingViewModel extends GetxController {
 
   Future<void> startPlogging() async {
     isTracking.value = true;
+
+    // 플로깅 시작 요청 및 ploggingId 업데이트
+    try {
+      StateWrapper<PloggingStartIndividualState> state =
+          await _startIndividualPloggingUseCase.execute(
+        StartIndividualPloggingCondition(regionId: regionId),
+      );
+
+      if (state.success && state.data != null) {
+        ploggingId = state.data!.ploggingId; // ploggingId 업데이트
+        debugPrint("Plogging started with ID: $ploggingId");
+      } else {
+        debugPrint("Failed to start plogging: ${state.message}");
+        return; // 요청 실패 시 중단
+      }
+    } catch (e) {
+      debugPrint("Error while starting plogging: $e");
+      return; // 에러 발생 시 중단
+    }
 
     // 위치 스트림 시작
     const LocationSettings locationSettings = LocationSettings(
@@ -95,6 +301,9 @@ class PloggingViewModel extends GetxController {
   Future<void> stopPlogging() async {
     isTracking.value = false;
     _stopTimer();
+
+    _startIndividualPloggingUseCase
+        .execute(StartIndividualPloggingCondition(regionId: regionId));
 
     if (routeCoordinates.isNotEmpty) {
       await showRouteCanvas(); // 플로깅 종료 시 자동 저장
@@ -353,7 +562,7 @@ class PloggingViewModel extends GetxController {
 
   Future<ui.Image> _loadMarkerImage() async {
     final pictureInfo = await vg.loadPicture(
-      SvgAssetLoader('assets/icons/location.svg'),
+      const SvgAssetLoader('assets/icons/location.svg'),
       null,
     );
 
@@ -395,91 +604,91 @@ class PloggingViewModel extends GetxController {
       ),
     );
   }
-  //
-  // Future<void> showRouteSVG() async {
-  //   if (routeCoordinates.isEmpty) return;
-  //
-  //   // 좌표 정규화
-  //   final normalizedCoords = _normalizeCoordinates();
-  //   final pathData = _createSVGPathData(normalizedCoords);
-  //
-  //   Get.dialog(
-  //     Dialog(
-  //       child: Container(
-  //         padding: const EdgeInsets.all(16),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             const Text('플로깅 경로', style: FontSystem.H3),
-  //             const SizedBox(height: 16),
-  //             AspectRatio(
-  //               aspectRatio: 1,
-  //               child: Container(
-  //                 padding: const EdgeInsets.all(16),
-  //                 child: SvgPicture.string(
-  //                   '''
-  //                 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  //                   <path
-  //                     d="$pathData"
-  //                     fill="none"
-  //                     stroke="green"
-  //                     stroke-width="2"
-  //                   />
-  //                 </svg>
-  //                 ''',
-  //                   fit: BoxFit.contain,
-  //                 ),
-  //               ),
-  //             ),
-  //             const SizedBox(height: 16),
-  //             ElevatedButton(
-  //               onPressed: () => Get.back(),
-  //               child: Text('닫기'),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // List<math.Point> _normalizeCoordinates() {
-  //   if (routeCoordinates.isEmpty) return [];
-  //
-  //   // 좌표 범위 계산
-  //   double minLat = routeCoordinates.first.latitude;
-  //   double maxLat = minLat;
-  //   double minLng = routeCoordinates.first.longitude;
-  //   double maxLng = minLng;
-  //
-  //   for (var coord in routeCoordinates) {
-  //     minLat = math.min(minLat, coord.latitude);
-  //     maxLat = math.max(maxLat, coord.latitude);
-  //     minLng = math.min(minLng, coord.longitude);
-  //     maxLng = math.max(maxLng, coord.longitude);
-  //   }
-  //
-  //   // 0~100 범위로 정규화
-  //   return routeCoordinates.map((coord) {
-  //     final x = ((coord.longitude - minLng) / (maxLng - minLng)) * 100;
-  //     final y = ((coord.latitude - minLat) / (maxLat - minLat)) * 100;
-  //     return math.Point(x, y);
-  //   }).toList();
-  // }
-  //
-  // String _createSVGPathData(List<math.Point> normalizedPoints) {
-  //   if (normalizedPoints.isEmpty) return '';
-  //
-  //   final start = normalizedPoints.first;
-  //   StringBuffer path = StringBuffer();
-  //
-  //   path.write('M ${start.x} ${start.y} ');
-  //
-  //   for (int i = 1; i < normalizedPoints.length; i++) {
-  //     final point = normalizedPoints[i];
-  //     path.write('L ${point.x} ${point.y} ');
-  //   }
-  //
-  //   return path.toString();
-  // }
+
+  Future<void> showRouteSVG() async {
+    if (routeCoordinates.isEmpty) return;
+
+    // 좌표 정규화
+    final normalizedCoords = _normalizeCoordinates();
+    final pathData = _createSVGPathData(normalizedCoords);
+
+    Get.dialog(
+      Dialog(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('플로깅 경로', style: FontSystem.H3),
+              const SizedBox(height: 16),
+              AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: SvgPicture.string(
+                    '''
+                  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="$pathData"
+                      fill="none"
+                      stroke="green"
+                      stroke-width="2"
+                    />
+                  </svg>
+                  ''',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Get.back(),
+                child: Text('닫기'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<math.Point> _normalizeCoordinates() {
+    if (routeCoordinates.isEmpty) return [];
+
+    // 좌표 범위 계산
+    double minLat = routeCoordinates.first.latitude;
+    double maxLat = minLat;
+    double minLng = routeCoordinates.first.longitude;
+    double maxLng = minLng;
+
+    for (var coord in routeCoordinates) {
+      minLat = math.min(minLat, coord.latitude);
+      maxLat = math.max(maxLat, coord.latitude);
+      minLng = math.min(minLng, coord.longitude);
+      maxLng = math.max(maxLng, coord.longitude);
+    }
+
+    // 0~100 범위로 정규화
+    return routeCoordinates.map((coord) {
+      final x = ((coord.longitude - minLng) / (maxLng - minLng)) * 100;
+      final y = ((coord.latitude - minLat) / (maxLat - minLat)) * 100;
+      return math.Point(x, y);
+    }).toList();
+  }
+
+  String _createSVGPathData(List<math.Point> normalizedPoints) {
+    if (normalizedPoints.isEmpty) return '';
+
+    final start = normalizedPoints.first;
+    StringBuffer path = StringBuffer();
+
+    path.write('M ${start.x} ${start.y} ');
+
+    for (int i = 1; i < normalizedPoints.length; i++) {
+      final point = normalizedPoints[i];
+      path.write('L ${point.x} ${point.y} ');
+    }
+
+    return path.toString();
+  }
 }
