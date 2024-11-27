@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -43,12 +45,7 @@
 	<array>
 		<string>kakaokompassauth</string>
 		<string>kakaolink</string>
-	</array>
-    <key>LSApplicationQueriesSchemes</key>
-	<array>
-        <string>kakaokompassauth</string>
-        <string>kakaolink</string>
-        <string>kakaoplus</string>
+		<string>kakaoplus</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -59,9 +56,9 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs permission for choosing image from your photo library</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to location when open to track your plogging route.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app needs access to location when in the background to track your plogging route.</string>
+	<string>This app needs access to location when open to track your plogging route.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location when in the background to track your plogging route.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
