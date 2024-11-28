@@ -25,14 +25,21 @@ Future<void> onInitSystem() async {
   // Widget Binding
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Firebase Initialize
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await NaverMapSdk.instance.initialize(
     clientId: DevEnvironment.NAVER_CLIENT_ID,
   );
 
   KakaoSdk.init(nativeAppKey: DevEnvironment.KAKAO_APP_KEY);
 
-  // Firebase Initialize
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Firebase foreground
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    NotificationUtil.showFlutterNotification(message);
+  });
+  FirebaseMessaging.onBackgroundMessage(NotificationUtil.onBackgroundHandler);
 
   // Health Initialize
   await HealthUtil.initialize();

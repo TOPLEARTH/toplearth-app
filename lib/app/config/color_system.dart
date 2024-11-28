@@ -13,6 +13,15 @@ abstract class ColorSystem {
     brightness: Brightness.light,
   );
 
+  /// ⭐️ toplearth color
+  static const Color main = Color(0xFF0F2A4F);
+
+  static const Color sub = Color(0xFF7389A9);
+
+  static const Color sub2 = Color(0xFF6E4EA);
+
+  static const Color greySub = Color(0xFFD9D9D9);
+
   /// Transparent Color
   static const Color transparent = Colors.transparent;
 
@@ -21,6 +30,24 @@ abstract class ColorSystem {
 
   /// Black Color
   static const Color black = Color(0xFF151515);
+
+  static const MaterialColor mainColor = MaterialColor(
+    _mainColorValue,
+    <int, Color>{
+      900: Color(0xFF0F2A4F),
+      800: Color(0xFF1A3A5F),
+      700: Color(0xFF2A4F7A),
+      600: Color(0xFF3A6495),
+      500: Color(0xFF4F7AAE),
+      400: Color(0xFF6A94C4),
+      300: Color(0xFF8AB0D9),
+      200: Color(0xFFAFCCEC),
+      100: Color(0xFFD9E8F6),
+      50: Color(0xFFEBF3FA),
+    },
+  );
+
+  static const int _mainColorValue = 0xFF0F2A4F;
 
   /// Primary Color
   static const MaterialColor primary = MaterialColor(
@@ -128,5 +155,24 @@ abstract class ColorSystem {
       50: Color(0xFFEBF4FC),
     },
   );
+
+  static const MaterialColor grey = MaterialColor(
+    _greyValue,
+    <int, Color>{
+      900: Color(0xFF1C1C1C),
+      800: Color(0xFF2E2E2E),
+      700: Color(0xFF494949),
+      600: Color(0xFF6A6A6A),
+      500: Color(0xFF929292),
+      400: Color(0xFFB7B7B7),
+      300: Color(0xFFD4D4D4),
+      200: Color(0xFFEAEAEA),
+      100: Color(0xFFF5F5F5),
+      50: Color(0xFFFAFAFA),
+    },
+  );
+
+  static const int _greyValue = 0xFF929292;
+
   static const int _blueValue = 0xFF5891EB;
 }

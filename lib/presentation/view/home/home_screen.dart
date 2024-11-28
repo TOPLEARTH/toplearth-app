@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:toplearth/app/config/color_system.dart';
-import 'package:toplearth/core/provider/base_socket.dart';
 import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/presentation/view/home/user_information/user_information_view.dart';
 import 'package:toplearth/presentation/view/home/user_information/user_location_section.dart';
@@ -42,4 +41,3 @@ class HomeScreen extends BaseScreen<HomeViewModel> {
     );
   }
 }
-

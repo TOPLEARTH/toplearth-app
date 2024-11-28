@@ -4,7 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:toplearth/NaverMapScreen.dart';
+import 'package:toplearth/test_code/NaverMapScreen.dart';
 
 class LocalPushNotifications {
   static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =

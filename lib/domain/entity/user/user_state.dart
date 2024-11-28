@@ -1,83 +1,70 @@
 class UserState {
-  final String id;
+  final String userId;
+  final String socialId;
   final String nickname;
-  final String email;
-  final String fcmToken;
-  // dummy
-  final int daysTogether;
-  final double currentProgress;
-  final int lastWeekSessions;
-  final int lastWeekDuration;
-  final int lastWeekCalories;
-
+  final double totalKilometers;
+  final double targetKilometers;
+  final int creditInfo;
+  final bool isJoinedTeam;
 
   const UserState({
-    required this.id,
+    required this.userId,
+    required this.socialId,
     required this.nickname,
-    required this.email,
-    required this.fcmToken,
-    required this.daysTogether,
-    required this.currentProgress,
-    required this.lastWeekSessions,
-    required this.lastWeekDuration,
-    required this.lastWeekCalories,
+    required this.totalKilometers,
+    required this.targetKilometers,
+    required this.creditInfo,
+    required this.isJoinedTeam,
   });
 
   factory UserState.initial() {
     return const UserState(
-      id: '',
-      nickname: '규진',
-      email: '',
-      fcmToken: '',
-      daysTogether: 2000,
-      currentProgress: 0.75,
-      lastWeekSessions: 200,
-      lastWeekDuration: 100,
-      lastWeekCalories: 4000,
+      userId: '',
+      socialId: '',
+      nickname: '',
+      totalKilometers: 0.0,
+      targetKilometers: 0.0,
+      creditInfo: 0,
+      isJoinedTeam: false,
     );
   }
 
   UserState copyWith({
-    String? id,
+    String? userId,
+    String? socialId,
     String? nickname,
-    String? email,
-    String? fcmToken,
-    int? daysTogether,
-    double? currentProgress,
-    int? lastWeekSessions,
-    int? lastWeekDuration,
-    int? lastWeekCalories,
+    double? totalKilometers,
+    double? targetKilometers,
+    int? creditInfo,
+    bool? isJoinedTeam,
   }) {
     return UserState(
-      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      socialId: socialId ?? this.socialId,
       nickname: nickname ?? this.nickname,
-      email: email ?? this.email,
-      fcmToken: fcmToken ?? this.fcmToken,
-      daysTogether: daysTogether ?? this.daysTogether,
-      currentProgress: currentProgress ?? this.currentProgress,
-      lastWeekSessions: lastWeekSessions ?? this.lastWeekSessions,
-      lastWeekDuration: lastWeekDuration ?? this.lastWeekDuration,
-      lastWeekCalories: lastWeekCalories ?? this.lastWeekCalories,
+      totalKilometers: totalKilometers ?? this.totalKilometers,
+      targetKilometers: targetKilometers ?? this.targetKilometers,
+      creditInfo: creditInfo ?? this.creditInfo,
+      isJoinedTeam: isJoinedTeam ?? this.isJoinedTeam,
     );
   }
 
-
   factory UserState.fromJson(Map<String, dynamic> data) {
     return UserState(
-      id: data['id'],
-      nickname: data['nickname'],
-      email: data['email'],
-      fcmToken: data['fcmToken'],
-      daysTogether: data['daysTogether'],
-      currentProgress: data['currentProgress'],
-      lastWeekSessions: data['lastWeekSessions'],
-      lastWeekDuration: data['lastWeekDuration'],
-      lastWeekCalories: data['lastWeekCalories'],
+      userId: data['userId'] ?? '',
+      socialId: data['socialId'] ?? '',
+      nickname: data['nickname'] ?? '',
+      totalKilometers:
+          double.tryParse(data['totalKilometers']?.toString() ?? '0') ?? 0.0,
+      targetKilometers:
+          double.tryParse(data['targetKilometers']?.toString() ?? '0') ?? 0.0,
+      creditInfo: int.tryParse(data['creditInfo']?.toString() ?? '0') ?? 0,
+      isJoinedTeam: data['isJoinedTeam'] ?? false,
     );
   }
 
   @override
   String toString() {
-    return 'UserBriefState(id: $id, nickname: $nickname, email: $email, fcmToken: $fcmToken)';
+    return 'UserState{userId: $userId, socialId: $socialId, nickname: $nickname, totalKilometers: $totalKilometers, targetKilometers: $targetKilometers, creditInfo: $creditInfo, isJoinedTeam: $isJoinedTeam}';
   }
 }

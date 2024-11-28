@@ -41,28 +41,50 @@ abstract class BaseConnect extends GetConnect {
       ..timeout = const Duration(seconds: 10);
 
     httpClient.addRequestModifier<dynamic>((request) {
-      String usedAuthorization = request.headers["usedAuthorization"]!;
-      String? usedInSplashScreen = request.headers["usedInSplashScreen"];
+      // 헤더 복사본 생성하여 작업
+      final headers = Map<String, String>.from(request.headers);
 
+      // 로그인 요청 체크
+      if (request.url.toString().contains('/auth/login')) {
+        LogUtil.info("🔑 Login request detected: ${request.url}");
+        return request;
+      }
+
+      // Authorization 처리
+      String? usedAuthorization = headers["usedAuthorization"];
+      /// accessToken 테스트를 원한다면 여기 _systemProvider.getAccessToken()대신 토큰 삽입하세요
       if (usedAuthorization == "true") {
-        request.headers["Authorization"] = "Bearer $accessToken";
+        headers["Authorization"] = "Bearer ${_systemProvider.getAccessToken()}";
       }
 
-      if (usedInSplashScreen == null) {
-        request.headers["usedInSplashScreen"] = "false";
+      debugPrint('current accessToken: ${_systemProvider.getAccessToken()}' );
+
+      // Splash Screen 처리
+      if (!headers.containsKey("usedInSplashScreen")) {
+        headers["usedInSplashScreen"] = "false";
       }
 
+      // 로깅
       LogUtil.info(
         "🛫 [${request.method}] ${request.url} | START",
       );
+      LogUtil.info("Headers: $headers");
+
+      // 헤더 한번에 교체
+      request.headers.clear();
+      request.headers.addAll(headers);
 
       return request;
     });
 
     httpClient.addResponseModifier((request, Response response) async {
       if (response.status.hasError) {
+        // 에러 응답 로깅
         LogUtil.error(
-          "🚨 [${request.method}] ${request.url} | END (${response.body['error']['code']}, ${response.body['error']['message']}, ${response.body['error']['fields']})",
+          "🚨 [${request.method}] ${request.url} | END",
+        );
+        LogUtil.error(
+          "Error: ${response.body['error']}",
         );
 
         await _isExpiredTokens(

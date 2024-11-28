@@ -1,29 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:toplearth/app/config/color_system.dart';
 
 @immutable
 abstract class BaseScreen<T extends GetxController> extends GetView<T> {
   const BaseScreen({super.key});
 
+  // 스크린샷 컨트롤러를 가져오는 메서드 추가
+  @protected
+  ScreenshotController getScreenshotController() {
+    throw UnimplementedError('Screenshot controller not implemented');
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 만약 뷰 모델이 초기화되지 않았다면 초기화 메서드를 호출
     if (!viewModel.initialized) {
       initViewModel();
     }
 
-    // SafeArea로 감싸거나 감싸지 않는 옵션에 따라 화면을 구성
+    // Screenshot이 필요한 화면인지 확인
+    if (needsScreenshot) {
+      return Screenshot(
+        controller: getScreenshotController(),
+        child: _buildBaseContainer(context),
+      );
+    }
+
+    return _buildBaseContainer(context);
+  }
+
+
+  /// 기존 Container 부분을 별도 메서드로 분리
+  Widget _buildBaseContainer(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: unSafeAreaColor,
       ),
       child: wrapWithInnerSafeArea
           ? SafeArea(
-              top: setTopOuterSafeArea,
-              bottom: setBottomOuterSafeArea,
-              child: _buildScaffold(context),
-            )
+        top: setTopOuterSafeArea,
+        bottom: setBottomOuterSafeArea,
+        child: _buildScaffold(context),
+      )
           : _buildScaffold(context),
     );
   }
@@ -47,6 +66,11 @@ abstract class BaseScreen<T extends GetxController> extends GetView<T> {
       bottomNavigationBar: buildBottomNavigationBar(context),
     );
   }
+
+
+  // Screenshot 필요 여부를 확인하는 getter (기본값 false)
+  @protected
+  bool get needsScreenshot => false;
 
   /// 뷰 모델을 초기화하는 메서드
   @protected

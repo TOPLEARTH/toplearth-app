@@ -19,6 +19,9 @@ dependencies:
   # Icons
   cupertino_icons: ^1.0.6
 
+  # Social Share
+  social_share: ^2.3.1
+
   # Localization
   intl: ^0.19.0
   timezone: ^0.9.4
@@ -41,6 +44,9 @@ dependencies:
 
   # Extended Nested Scroll View
   extended_nested_scroll_view: ^6.2.1
+
+  # debounce_throttle
+  debounce_throttle: ^2.0.0
 
   # model_viewer_plus
   model_viewer_plus: ^1.9.0
@@ -86,8 +92,18 @@ dependencies:
   flutter_naver_map: ^1.3.0+1
   url_launcher: ^6.3.1
 
+
+  image_picker: ^1.1.2
+
   # stomp
   stomp_dart_client: ^1.0.3
+  geolocator: ^13.0.2
+  path_provider: ^2.1.5
+  table_calendar: ^3.1.2
+  googleapis_auth: ^1.6.0
+
+  # geolocation
+  geocoding: ^3.0.0
 
 dev_dependencies:
   # Default
@@ -108,14 +124,21 @@ dev_dependencies:
   envied_generator: ^0.5.4+1
   build_runner: ^2.4.11
 
+  #screen shot
+  screenshot: ^3.0.0
+
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/
+    - assets/images/shares/
+    - assets/images/seoul/
+    - assets/images/quest/
     - assets/icons/
     - assets/icons/bottom_navigation/
     - assets/animations/
+    - assets/config/
 
   fonts:
     - family: Pretendard
