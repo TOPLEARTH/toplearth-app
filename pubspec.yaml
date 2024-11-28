@@ -97,13 +97,13 @@ dependencies:
 
   # stomp
   stomp_dart_client: ^1.0.3
-
+  geolocator: ^13.0.2
   path_provider: ^2.1.5
+  table_calendar: ^3.1.2
   googleapis_auth: ^1.6.0
 
   # geolocation
   geocoding: ^3.0.0
-  geolocator: ^13.0.2
 
 dev_dependencies:
   # Default
@@ -134,6 +134,7 @@ flutter:
     - assets/images/
     - assets/images/shares/
     - assets/images/seoul/
+    - assets/images/quest/
     - assets/icons/
     - assets/icons/bottom_navigation/
     - assets/animations/
