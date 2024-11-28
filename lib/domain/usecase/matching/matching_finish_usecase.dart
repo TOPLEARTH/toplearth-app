@@ -4,7 +4,7 @@ import 'package:toplearth/core/usecase/common/base_usecase.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/repository/matching/matching_repository.dart';
 
-class MatchingFinishUsecase extends BaseUseCase
+class MatchingFinishUseCase extends BaseUseCase
     implements AsyncNoConditionUseCase<void> {
   late final MatchingRepository _matchingRepository;
 

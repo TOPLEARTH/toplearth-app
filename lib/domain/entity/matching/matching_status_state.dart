@@ -1,36 +1,43 @@
 import 'package:toplearth/domain/type/e_matching_status.dart';
 
 class MatchingStatusState {
-  final EMatchingStatus matchingStatus;
+  final EMatchingStatus status;
 
   MatchingStatusState({
-    required this.matchingStatus,
+    required this.status,
   });
 
   MatchingStatusState copyWith({
-    EMatchingStatus? matchingStatus,
+    EMatchingStatus? status,
   }) {
     return MatchingStatusState(
-      matchingStatus: matchingStatus ?? this.matchingStatus,
+      status: status ?? this.status,
     );
   }
 
   MatchingStatusState initial() {
     return MatchingStatusState(
-      matchingStatus: EMatchingStatus.WAITING,
+      status: EMatchingStatus.WAITING,
     );
   }
 
 
   factory MatchingStatusState.fromJson(Map<String, dynamic> json) {
     return MatchingStatusState(
-      matchingStatus: EMatchingStatus.values.firstWhere((e) => e.toString() == json['matchingStatus']),
+      status: EMatchingStatus.values.firstWhere(
+            (e) => e.name == json['status'],
+        orElse: () {
+          // 기본 상태 반환 (예: WAITING)
+          return EMatchingStatus.WAITING;
+        },
+      ),
     );
   }
 
+
   Map<String, dynamic> toJson() {
     return {
-      'matchingStatus': matchingStatus.toString(),
+      'status': status.name,
     };
   }
 }
