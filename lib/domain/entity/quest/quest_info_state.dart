@@ -20,7 +20,11 @@ class QuestInfoState {
   }
 
   /// Static initial value
-  static QuestInfoState get initial => QuestInfoState(dailyQuest: {});
+  factory QuestInfoState.initial() {
+    return QuestInfoState(
+      dailyQuest: {},
+    );
+  }
 
   @override
   String toString() {

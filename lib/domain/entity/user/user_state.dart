@@ -54,8 +54,10 @@ class UserState {
       userId: data['userId'] ?? '',
       socialId: data['socialId'] ?? '',
       nickname: data['nickname'] ?? '',
-      totalKilometers: double.tryParse(data['totalKilometers']?.toString() ?? '0') ?? 0.0,
-      targetKilometers: double.tryParse(data['targetKilometers']?.toString() ?? '0') ?? 0.0,
+      totalKilometers:
+          double.tryParse(data['totalKilometers']?.toString() ?? '0') ?? 0.0,
+      targetKilometers:
+          double.tryParse(data['targetKilometers']?.toString() ?? '0') ?? 0.0,
       creditInfo: int.tryParse(data['creditInfo']?.toString() ?? '0') ?? 0,
       isJoinedTeam: data['isJoinedTeam'] ?? false,
     );

@@ -5,6 +5,7 @@ class QuestState {
   final double? myKmNumber;
   final int? myPickNumber;
   final int? myLabelNumber;
+  final int questCredit; // 추가된 필드
   final String createdAt;
 
   QuestState({
@@ -14,6 +15,7 @@ class QuestState {
     this.myKmNumber,
     this.myPickNumber,
     this.myLabelNumber,
+    required this.questCredit, // 필수 값으로 설정
     required this.createdAt,
   });
 
@@ -29,6 +31,7 @@ class QuestState {
           : null,
       myPickNumber: json['myPickNumber'] as int?,
       myLabelNumber: json['myLabelNumber'] as int?,
+      questCredit: json['questCredit'] as int? ?? 0, // 기본값 설정
       createdAt: json['createdAt'] ?? '',
     );
   }
@@ -41,11 +44,12 @@ class QuestState {
         myKmNumber: null,
         myPickNumber: null,
         myLabelNumber: null,
-        createdAt: '', // Default empty string for createdAt
+        questCredit: 0, // 기본값 설정
+        createdAt: '',
       );
 
   @override
   String toString() {
-    return 'QuestState(targetKmName: $targetKmName, targetPickNumber: $targetPickNumber, targetLabelNumber: $targetLabelNumber, myKmNumber: $myKmNumber, myPickNumber: $myPickNumber, myLabelNumber: $myLabelNumber, createdAt: $createdAt)';
+    return 'QuestState(targetKmName: $targetKmName, targetPickNumber: $targetPickNumber, targetLabelNumber: $targetLabelNumber, myKmNumber: $myKmNumber, myPickNumber: $myPickNumber, myLabelNumber: $myLabelNumber, questCredit: $questCredit, createdAt: $createdAt)';
   }
 }

@@ -45,6 +45,7 @@
 import 'package:toplearth/domain/entity/global/legacy_info_state.dart';
 import 'package:toplearth/domain/entity/global/region_ranking_info_state.dart';
 import 'package:toplearth/domain/entity/group/team_info_state.dart';
+import 'package:toplearth/domain/entity/home/home_info_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_info_state.dart';
 import 'package:toplearth/domain/entity/quest/quest_info_state.dart';
 import 'package:toplearth/domain/entity/user/user_state.dart';
@@ -56,7 +57,7 @@ class BootstrapState {
   final PloggingInfoState ploggingInfo;
   final LegacyInfoState legacyInfo;
   final RegionRankingInfoState regionRankingInfo;
-
+  final HomeInfoState homeInfo;
   BootstrapState({
     required this.userInfo,
     required this.questInfo,
@@ -64,6 +65,7 @@ class BootstrapState {
     required this.ploggingInfo,
     required this.legacyInfo,
     required this.regionRankingInfo,
+    required this.homeInfo,
   });
 
   factory BootstrapState.fromJson(Map<String, dynamic> json) {
@@ -77,11 +79,12 @@ class BootstrapState {
       legacyInfo: LegacyInfoState.fromJson(json['legacyInfo']),
       regionRankingInfo:
           RegionRankingInfoState.fromJson(json['regionRankingInfo']),
+      homeInfo: HomeInfoState.fromJson(json['homeInfo']),
     );
   }
 
   @override
   String toString() {
-    return 'BootstrapState(userInfo: $userInfo, questInfo: $questInfo, teamInfo: $teamInfo, ploggingInfo: $ploggingInfo, legacyInfo: $legacyInfo, regionRankingInfo: $regionRankingInfo)';
+    return 'BootstrapState(userInfo: $userInfo, questInfo: $questInfo, teamInfo: $teamInfo, ploggingInfo: $ploggingInfo, legacyInfo: $legacyInfo, regionRankingInfo: $regionRankingInfo, homeInfo: $homeInfo)';
   }
 }
