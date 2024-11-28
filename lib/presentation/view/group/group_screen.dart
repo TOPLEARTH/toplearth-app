@@ -48,6 +48,7 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
                   _buildCircularProgressBar(),
                 ],
               ),
+              _buildDistanceList(),
             ],
           ),
         ),
@@ -182,6 +183,48 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDistanceList() {
+    if (viewModel.currentMonthData == null) {
+      return const Center(child: Text("이번 달 데이터가 없습니다."));
+    }
+
+    final maxDistance = viewModel.currentMonthData!.members
+        .map((e) => e.distance)
+        .reduce((a, b) => a > b ? a : b);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("팀원별 이동 거리", style: FontSystem.H3),
+        const SizedBox(height: 16),
+        ...viewModel.currentMonthData!.members.map(
+          (member) {
+            final progress = member.distance / maxDistance;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Text(member.name, style: FontSystem.H4),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: ColorSystem.grey[300],
+                      color: ColorSystem.main,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text("${member.distance.toStringAsFixed(1)}km",
+                      style: FontSystem.H4),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }
