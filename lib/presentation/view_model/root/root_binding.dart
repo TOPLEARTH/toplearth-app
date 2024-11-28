@@ -4,7 +4,7 @@ import 'package:toplearth/presentation/view_model/group/group_binding.dart';
 import 'package:toplearth/presentation/view_model/home/home_binding.dart';
 import 'package:toplearth/presentation/view_model/legacy/legacy_binding.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_group_binding.dart';
-import 'package:toplearth/presentation/view_model/my_page/matching_binding.dart';
+import 'package:toplearth/presentation/view_model/my_page/my_page_binding.dart';
 import 'package:toplearth/presentation/view_model/plogging/plogging_binding.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/view_model/store/store_binding.dart';
@@ -14,7 +14,7 @@ class RootBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<RootViewModel>(() => RootViewModel());
     Get.lazyPut<ReadBootStrapUseCase>(
-          () => ReadBootStrapUseCase(),
+      () => ReadBootStrapUseCase(),
     );
     PloggingBinding().dependencies();
     MyPageBinding().dependencies();

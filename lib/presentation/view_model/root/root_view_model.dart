@@ -9,6 +9,7 @@ import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/entity/global/legacy_info_state.dart';
 import 'package:toplearth/domain/entity/global/region_ranking_info_state.dart';
 import 'package:toplearth/domain/entity/group/team_info_state.dart';
+import 'package:toplearth/domain/entity/home/home_info_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_info_state.dart';
 import 'package:toplearth/domain/entity/quest/quest_info_state.dart';
 import 'package:toplearth/domain/entity/user/boot_strap_state.dart';
@@ -40,7 +41,7 @@ class RootViewModel extends GetxController {
   late final Rx<PloggingInfoState> _ploggingInfoState;
   late final Rx<LegacyInfoState> _legacyInfoState;
   late final Rx<RegionRankingInfoState> _regionRankingInfoState;
-
+  late final Rx<HomeInfoState> _homeInfoState;
   /* ------------------------------------------------------ */
   /* ----------------- Public Fields ---------------------- */
   /* ------------------------------------------------------ */
@@ -54,7 +55,7 @@ class RootViewModel extends GetxController {
   LegacyInfoState get legacyInfoState => _legacyInfoState.value;
   RegionRankingInfoState get regionRankingInfoState =>
       _regionRankingInfoState.value;
-
+  HomeInfoState get homeInfoState => _homeInfoState.value;
   RxBool isBootstrapLoaded = false.obs;
 
 
@@ -72,12 +73,12 @@ class RootViewModel extends GetxController {
     _readBootStrapUseCase = Get.find<ReadBootStrapUseCase>();
 
     _userState = UserState.initial().obs;
-    _questInfoState = QuestInfoState.initial.obs;
+    _questInfoState = QuestInfoState.initial().obs;
     _teamInfoState = TeamInfoState.initial().obs;
     _ploggingInfoState = PloggingInfoState.initial().obs;
     _legacyInfoState = LegacyInfoState.initial().obs;
     _regionRankingInfoState = RegionRankingInfoState.initial().obs;
-
+    _homeInfoState = HomeInfoState.initial().obs;
     _selectedIndex = 2.obs;
 
     // FCM Setting
@@ -177,11 +178,8 @@ class RootViewModel extends GetxController {
       _ploggingInfoState.value = state.data!.ploggingInfo;
       _legacyInfoState.value = state.data!.legacyInfo;
       _regionRankingInfoState.value = state.data!.regionRankingInfo;
-
-      debugPrint('userState: ${_userState.value.nickname}');
-
-      debugPrint('legacyInfoState: ${_legacyInfoState.value.totalTrashCnt}');
-
+      _homeInfoState.value = state.data!.homeInfo;
+      debugPrint('PloggingInfo: ${_ploggingInfoState.value}');
       isBootstrapLoaded.value = true; // 로드 완료 상태 업데이트
     }
     debugPrint('isBootstrapLoaded: ${isBootstrapLoaded.value}');
