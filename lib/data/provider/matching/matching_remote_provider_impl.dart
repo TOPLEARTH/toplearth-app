@@ -35,7 +35,7 @@ class MatchingRemoteProviderImpl extends BaseConnect
   // 매칭 종료
   @override
   Future<ResponseWrapper> endMatching() async {
-    Response response = await post(
+    Response response = await patch(
       "/api/v1/matching/end",
       {},
       headers: BaseConnect.usedAuthorization,
