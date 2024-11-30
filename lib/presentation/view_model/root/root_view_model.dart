@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:core';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:toplearth/app/env/dev/dev_environment.dart';
 import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
@@ -15,9 +19,6 @@ import 'package:toplearth/domain/entity/quest/quest_info_state.dart';
 import 'package:toplearth/domain/entity/user/boot_strap_state.dart';
 import 'package:toplearth/domain/entity/user/user_state.dart';
 import 'package:toplearth/domain/usecase/user/read_user_state_usecase.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 
 class RootViewModel extends GetxController {
   /* ------------------------------------------------------ */
@@ -57,7 +58,6 @@ class RootViewModel extends GetxController {
       _regionRankingInfoState.value;
   HomeInfoState get homeInfoState => _homeInfoState.value;
   RxBool isBootstrapLoaded = false.obs;
-
 
   // 전역 상태로 관리할 위치 정보
   RxDouble latitude = 0.0.obs;
@@ -126,8 +126,6 @@ class RootViewModel extends GetxController {
     await _fetchRegionInfo(position.latitude, position.longitude);
   }
 
-
-
   // 위도/경도를 기반으로 지역 및 regionId 조회
   Future<void> _fetchRegionInfo(double lat, double lng) async {
     try {
@@ -156,7 +154,6 @@ class RootViewModel extends GetxController {
     }
   }
 
-
   void changeIndex(int index) async {
     _selectedIndex.value = index;
     _currentAt.value = DateTime.now();
@@ -164,11 +161,11 @@ class RootViewModel extends GetxController {
 
   @override
   void onReady() async {
-    _fetchBootstrapInformation();
+    await fetchBootstrapInformation();
     super.onReady();
   }
 
-  void _fetchBootstrapInformation() async {
+  Future<void> fetchBootstrapInformation() async {
     StateWrapper<BootstrapState> state = await _readBootStrapUseCase.execute();
 
     if (state.success) {
@@ -217,9 +214,7 @@ class RootViewModel extends GetxController {
   }
 }
 
-
 Future<String?> fetchRegionFromNaverAPI(double lat, double lng) async {
-
   final String apiUrl =
       "https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc";
 
