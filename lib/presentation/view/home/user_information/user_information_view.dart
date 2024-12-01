@@ -1,47 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/color_system.dart';
+import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/presentation/view/home/user_information/user_progress_bar.dart';
-import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
+import 'package:toplearth/presentation/view_model/home/home_view_model.dart';
 
-class HomeUserInfoView extends BaseWidget<RootViewModel> {
+class HomeUserInfoView extends BaseWidget<HomeViewModel> {
   const HomeUserInfoView({super.key});
 
   @override
   Widget buildView(BuildContext context) {
-    // 뷰모델 데이터
-    final String userName = viewModel.userState.nickname;
-
-    // final int joinedTime;
-    // final int ploggingMonthlyCount;
-    // final int ploggingMonthlyDuration;
-
-    final int joinedTime = viewModel.homeInfoState.joinedTime;
-    final int ploggingMonthlyCount =
-        viewModel.homeInfoState.ploggingMonthlyCount;
-    final int ploggingMonthlyDuration =
-        viewModel.homeInfoState.ploggingMonthlyDuration;
-    final double totalKilometers = viewModel.userState.totalKilometers;
-    final double targetKilometers = viewModel.userState.targetKilometers;
-
-    // final int daysTogether = viewModel.userState.;
-    // final double currentProgress = viewModel.userState.currentProgress;
-    // final int lastWeekSessions = viewModel.userState.lastWeekSessions;
-    // final int lastWeekDuration = viewModel.userState.lastWeekDuration;
-    // final int lastWeekCalories = viewModel.userState.lastWeekCalories;
     double calculateProgress(double totalKilometers, double targetKilometers) {
       if (targetKilometers == 0) {
-        return 0.0; // 목표 거리가 0일 경우 진행률은 0%
+        return 0.0;
       }
       return totalKilometers / targetKilometers;
+    }
+
+    void showTargetInputDialog(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return DistanceDialog(context);
+        },
+      );
     }
 
     return Obx(
       () => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 상단 텍스트
           Align(
             alignment: Alignment.centerRight,
             child: Text(
@@ -59,9 +48,7 @@ class HomeUserInfoView extends BaseWidget<RootViewModel> {
               const Text('주간 목표'),
               const Spacer(),
               GestureDetector(
-                onTap: () {
-                  print('목표 설정하기 tapped');
-                },
+                onTap: () => showTargetInputDialog(context),
                 child: const Text(
                   '목표 설정하기',
                   style: TextStyle(
@@ -73,17 +60,14 @@ class HomeUserInfoView extends BaseWidget<RootViewModel> {
             ],
           ),
           const SizedBox(height: 8),
-          // ProgressBar 컴포넌트
-
           UserProgressBar(
             progress: calculateProgress(viewModel.userState.totalKilometers,
-                viewModel.userState.targetKilometers), // 진행률
-            height: 10, // 높이
+                viewModel.userState.targetKilometers),
+            height: 10,
             backgroundColor: const Color(0xFFE0E0E0),
             progressColor: const Color(0xFF0F2A4F),
           ),
           const SizedBox(height: 8),
-          // 거리 텍스트
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -93,20 +77,19 @@ class HomeUserInfoView extends BaseWidget<RootViewModel> {
             ],
           ),
           const SizedBox(height: 16),
-          // 지난 주 플로깅 결산
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Column(
                 children: [
                   Text(
-                    '$ploggingMonthlyCount 회',
+                    '${viewModel.homeInfoState.ploggingMonthlyCount} 회',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text('지난주 플로깅 횟수'),
+                  const Text('지난달 플로깅 횟수'),
                 ],
               ),
               Column(
@@ -118,25 +101,55 @@ class HomeUserInfoView extends BaseWidget<RootViewModel> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text('지난주 플로깅 시간'),
+                  const Text('지난달 플로깅 시간'),
                 ],
               ),
               Column(
                 children: [
-                  Text(
-                    '${viewModel.homeInfoState.burnedCalories} kcal',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text('지난주 소모 칼로리'),
+                  Text('${viewModel.homeInfoState.burnedCalories} kcal',
+                      style: FontSystem.H4),
+                  const Text('지난달 소모 칼로리'),
                 ],
               ),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget DistanceDialog(BuildContext context) {
+    final controller = TextEditingController();
+    return AlertDialog(
+      title: const Text('목표 설정하기'),
+      content: TextField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(
+          hintText: "목표 KM 입력",
+          border: OutlineInputBorder(),
+          labelStyle: TextStyle(color: ColorSystem.main),
+          hintStyle: TextStyle(color: ColorSystem.main),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('취소'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('확인'),
+          onPressed: () {
+            final input = double.tryParse(controller.text);
+            if (input != null) {
+              viewModel.setGoalDistance(input);
+            }
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
   }
 }

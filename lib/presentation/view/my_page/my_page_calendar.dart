@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_state.dart';
 import 'package:toplearth/presentation/view_model/my_page/my_page_view_model.dart';
@@ -27,9 +26,8 @@ class CalendarWidget extends BaseWidget<MyPageViewModel> {
       locale: 'ko_KR',
       firstDay: DateTime.utc(2020, 1, 1),
       lastDay: DateTime.utc(2030, 12, 31),
-      focusedDay: viewModel.focusedDate.value,
-      selectedDayPredicate: (day) =>
-          isSameDay(viewModel.selectedDate.value, day),
+      focusedDay: viewModel.focusedDate,
+      selectedDayPredicate: (day) => isSameDay(viewModel.selectedDate, day),
       onDaySelected: (selectedDay, focusedDay) {
         viewModel.updateSelectedDate(selectedDay);
         viewModel.updateFocusedDate(focusedDay);
@@ -46,7 +44,7 @@ class CalendarWidget extends BaseWidget<MyPageViewModel> {
         selectedBuilder: (context, day, focusedDay) {
           return Container(
             decoration: const BoxDecoration(
-              color: ColorSystem.main,
+              color: Colors.green,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
@@ -56,6 +54,11 @@ class CalendarWidget extends BaseWidget<MyPageViewModel> {
             ),
           );
         },
+      ),
+      headerStyle: const HeaderStyle(
+        titleCentered: true,
+        headerMargin: EdgeInsets.only(bottom: 24),
+        formatButtonVisible: false,
       ),
     );
   }

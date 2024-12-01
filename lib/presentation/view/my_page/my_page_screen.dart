@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
@@ -23,9 +24,6 @@ class MyPageScreen extends BaseScreen<MyPageViewModel> {
         children: [
           // 항상 표시되는 Tab Selector
           _buildTabSelector(),
-
-          // Daily Quest 탭일 때만 Day Selector 표시
-          if (viewModel.selectedTab == 'DAILY 퀘스트') _buildDaySelector(),
 
           // 조건에 따라 다른 위젯 표시
           Expanded(
@@ -61,8 +59,9 @@ class MyPageScreen extends BaseScreen<MyPageViewModel> {
   Widget _buildTabSelector() {
     return Obx(() {
       return Container(
-        width: Get.width * 0.9,
+        width: Get.width * 0.65,
         padding: const EdgeInsets.symmetric(vertical: 4.0),
+        margin: const EdgeInsets.symmetric(vertical: 24.0),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(32),
@@ -79,46 +78,17 @@ class MyPageScreen extends BaseScreen<MyPageViewModel> {
     });
   }
 
-  // 날짜 선택 영역
-  Widget _buildDaySelector() {
-    final days = ['월', '화', '수', '목', '금', '토', '일'];
-
-    return Obx(() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(days.length, (index) {
-            final isSelected = controller.selectedDayIndex == index;
-
-            return GestureDetector(
-              onTap: () => controller.selectDay(index), // 선택된 요일 업데이트
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: CircleAvatar(
-                  radius: 18,
-                  backgroundColor:
-                      isSelected ? ColorSystem.main : Colors.grey.shade200,
-                  child: Text(
-                    days[index],
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-      );
-    });
-  }
-
   // 퀘스트 리스트
   Widget _buildQuestList() {
-    final quests = viewModel.questInfoState.dailyQuest["2024-11-27"];
+    // Get the current date
+    final DateTime now = DateTime.now();
+
+    // Format the date as "yyyy-MM-dd"
+    final String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+
+    // Use the formatted date to retrieve quests
+    final quests = viewModel.questInfoState.dailyQuest[formattedDate];
+
     if (quests == null || quests.isEmpty) {
       return const Center(
         child: Text(
@@ -130,10 +100,10 @@ class MyPageScreen extends BaseScreen<MyPageViewModel> {
 
     return Obx(() {
       return ListView.builder(
-        itemCount: viewModel.questInfoState.dailyQuest["2024-11-27"]?.length,
+        itemCount: viewModel.questInfoState.dailyQuest[formattedDate]?.length,
         itemBuilder: (context, index) {
           return _buildQuestItem(
-              viewModel.questInfoState.dailyQuest["2024-11-27"]![index]);
+              viewModel.questInfoState.dailyQuest[formattedDate]![index]);
         },
       );
     });
@@ -160,14 +130,14 @@ class MyPageScreen extends BaseScreen<MyPageViewModel> {
     }
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
             // 아이콘
-            Image.asset(iconPath, width: 100, height: 100),
+            Image.asset(iconPath, width: 110, height: 110),
             const SizedBox(width: 16),
             // 제목 및 진행 상태
             Expanded(
