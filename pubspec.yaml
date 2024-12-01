@@ -32,6 +32,8 @@ dependencies:
   # GetX
   get: ^4.6.6
 
+  socket_io_client: ^3.0.2
+
   # Svg
   flutter_svg: ^2.0.10+1
 
@@ -104,6 +106,7 @@ dependencies:
 
   # geolocation
   geocoding: ^3.0.0
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   # Default
@@ -135,10 +138,12 @@ flutter:
     - assets/images/shares/
     - assets/images/seoul/
     - assets/images/quest/
+    - assets/images/labeling/
     - assets/icons/
     - assets/icons/bottom_navigation/
     - assets/animations/
     - assets/config/
+    - assets/images/store/
 
   fonts:
     - family: Pretendard
