@@ -9,6 +9,8 @@ class RoundedRectangleTextButton extends StatefulWidget {
     this.icon,
     this.textStyle,
     this.backgroundColor,
+    this.borderColor,
+    this.borderWidth = 0.0,
     this.onPressed,
     this.borderRadius = 8.0,
     this.iconSpacing = 8.0,
@@ -20,6 +22,8 @@ class RoundedRectangleTextButton extends StatefulWidget {
   final Widget? icon;
   final TextStyle? textStyle;
   final Color? backgroundColor;
+  final Color? borderColor; // 테두리 색상
+  final double borderWidth; // 테두리 두께
   final Function()? onPressed;
   final double borderRadius;
   final double iconSpacing;
@@ -67,6 +71,12 @@ class _RoundedRectangleTextButtonState
           decoration: BoxDecoration(
             color: widget.backgroundColor,
             borderRadius: BorderRadius.circular(widget.borderRadius),
+            border: widget.borderColor != null && widget.borderWidth > 0
+                ? Border.all(
+              color: widget.borderColor!,
+              width: widget.borderWidth,
+            )
+                : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

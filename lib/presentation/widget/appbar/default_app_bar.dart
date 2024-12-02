@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/utility/log_util.dart';
+import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 import 'package:toplearth/presentation/widget/image/png_image_view.dart';
 import 'package:toplearth/presentation/widget/image/svg_image_view.dart';
 
@@ -69,7 +70,9 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Get.toNamed(AppRoutes.TEST_CODE);
+                    // finishMatching
+                    Get.find<MatchingGroupViewModel>().finishVsMatching(20,  200, 300, true);
+                    // Get.toNamed(AppRoutes.TEST_CODE);
                     LogUtil.info('Setting button tapped');
                     // Get.toNamed(AppRoutes.APP_SETTING); // 알림 화면 이동
                   },
