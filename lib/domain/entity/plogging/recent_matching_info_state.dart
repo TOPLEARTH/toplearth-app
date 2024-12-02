@@ -5,6 +5,12 @@ class RecentMatchingInfoState {
 
   RecentMatchingInfoState({required this.recentMatchingInfo});
 
+  factory RecentMatchingInfoState.initial() {
+    return RecentMatchingInfoState(
+      recentMatchingInfo: [],
+    );
+  }
+
   RecentMatchingInfoState copyWith({
     List<PloggingRecentState>? recentMatchingInfo,
   }) {

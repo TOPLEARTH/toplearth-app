@@ -108,7 +108,7 @@ class UserEarthView extends StatelessWidget {
           children: [
             const CustomModelViewer(
               animationToPlay: 'Animation.sad',
-              src: 'assets/animations/sad3.glb',
+              src: 'assets/animations/happy.glb',
               backgroundColor: Colors.white,
               autoRotateDelay: 0,
             ),

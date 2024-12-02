@@ -2,22 +2,22 @@ import 'package:toplearth/domain/entity/group/member_state.dart';
 import 'package:toplearth/domain/entity/group/monthly_group_state.dart';
 
 class TeamInfoState {
-  final int? teamId;
-  final String? teamName;
-  final String? teamCode;
-  final int? matchCnt;
-  final int? winCnt;
-  final List<MemberState>? teamMembers;
-  final Map<String, MonthlyGroupState>? monthlyData;
+  final int teamId;
+  final String teamName;
+  final String teamCode;
+  final int matchCnt;
+  final int winCnt;
+  final List<MemberState> teamMembers;
+  final Map<String, MonthlyGroupState> monthlyData;
 
   TeamInfoState({
-    this.teamId,
-    this.teamName,
-    this.teamCode,
-    this.matchCnt,
-    this.winCnt,
-    this.teamMembers,
-    this.monthlyData,
+    required this.teamId,
+    required this.teamName,
+    required this.teamCode,
+    required this.matchCnt,
+    required this.winCnt,
+    required this.teamMembers,
+    required this.monthlyData,
   });
 
   TeamInfoState copyWith({
