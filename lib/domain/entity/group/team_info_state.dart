@@ -2,22 +2,22 @@ import 'package:toplearth/domain/entity/group/member_state.dart';
 import 'package:toplearth/domain/entity/group/monthly_group_state.dart';
 
 class TeamInfoState {
-  final int teamId;
-  final String teamName;
-  final String teamCode;
-  final int matchCnt;
-  final int winCnt;
-  final List<MemberState> teamMemebers;
-  final Map<String, MonthlyGroupState> monthlyData;
+  final int? teamId;
+  final String? teamName;
+  final String? teamCode;
+  final int? matchCnt;
+  final int? winCnt;
+  final List<MemberState>? teamMembers;
+  final Map<String, MonthlyGroupState>? monthlyData;
 
   TeamInfoState({
-    required this.teamId,
-    required this.teamName,
-    required this.teamCode,
-    required this.matchCnt,
-    required this.winCnt,
-    required this.teamMemebers,
-    required this.monthlyData,
+    this.teamId,
+    this.teamName,
+    this.teamCode,
+    this.matchCnt,
+    this.winCnt,
+    this.teamMembers,
+    this.monthlyData,
   });
 
   TeamInfoState copyWith({
@@ -26,7 +26,7 @@ class TeamInfoState {
     String? teamCode,
     int? matchCnt,
     int? winCnt,
-    List<MemberState>? teamMemebers,
+    List<MemberState>? teamMembers,
     Map<String, MonthlyGroupState>? monthlyData,
   }) {
     return TeamInfoState(
@@ -35,7 +35,7 @@ class TeamInfoState {
       teamCode: teamCode ?? this.teamCode,
       matchCnt: matchCnt ?? this.matchCnt,
       winCnt: winCnt ?? this.winCnt,
-      teamMemebers: teamMemebers ?? this.teamMemebers,
+      teamMembers: teamMembers ?? this.teamMembers,
       monthlyData: monthlyData ?? this.monthlyData,
     );
   }
@@ -47,7 +47,7 @@ class TeamInfoState {
       teamCode: '',
       matchCnt: 0,
       winCnt: 0,
-      teamMemebers: [],
+      teamMembers: [],
       monthlyData: {},
     );
   }
@@ -59,7 +59,7 @@ class TeamInfoState {
       teamCode: json['teamCode'],
       matchCnt: json['matchCnt'],
       winCnt: json['winCnt'],
-      teamMemebers: (json['teamMemebers'] as List<dynamic>?)
+      teamMembers: (json['teamMembers'] as List<dynamic>?)
               ?.map(
                 (member) =>
                     MemberState.fromJson(member as Map<String, dynamic>),
@@ -80,6 +80,6 @@ class TeamInfoState {
   String toString() {
     return 'TeamInfoState(teamId: $teamId, teamName: $teamName, '
         'teamCode: $teamCode, matchCnt: $matchCnt, winCnt: $winCnt, '
-        'teamMemebers: $teamMemebers, monthlyData: $monthlyData)';
+        'teamMembers: $teamMembers, monthlyData: $monthlyData)';
   }
 }

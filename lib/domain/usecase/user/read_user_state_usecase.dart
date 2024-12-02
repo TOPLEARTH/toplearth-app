@@ -21,6 +21,8 @@ class ReadBootStrapUseCase extends BaseUseCase
   Future<StateWrapper<BootstrapState>> execute() async {
     StateWrapper<BootstrapState> state = await _userRepository.readBootStrapData();
 
+    print('ReadBootStrapUseCase: ${state.data}');
+
     return state;
   }
 }
