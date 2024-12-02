@@ -15,16 +15,22 @@ class HomeMapSwitcherView extends StatelessWidget {
 
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(
-              () => GestureDetector(
-                onTap: () async {
-                  await viewModel.fetchCurrentLocation();
-                },
-                child: Row(
-                  children: [
+        Obx(
+          () => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  if (viewModel.isLoading.value)
+                    const Text(
+                      '로딩 중...',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF607D8B),
+                      ),
+                    )
+                  else
                     Text(
                       viewModel.regionName.value,
                       style: const TextStyle(
@@ -33,23 +39,22 @@ class HomeMapSwitcherView extends StatelessWidget {
                         color: Color(0xFF607D8B),
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.location_on, color: Color(0xFF607D8B)),
-                  ],
+                  const SizedBox(width: 4),
+                  const Icon(Icons.location_on, color: Color(0xFF607D8B)),
+                ],
+              ),
+              const Spacer(),
+              IconButton(
+                onPressed: viewModel.toggleView,
+                icon: Obx(
+                  () => Icon(
+                    viewModel.showEarthView.value ? Icons.map : Icons.public,
+                    color: const Color(0xFF607D8B),
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-            IconButton(
-              onPressed: viewModel.toggleView,
-              icon: Obx(
-                () => Icon(
-                  viewModel.showEarthView.value ? Icons.map : Icons.public,
-                  color: const Color(0xFF607D8B),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 8),
         Obx(
