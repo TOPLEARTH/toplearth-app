@@ -1,20 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/utility/log_util.dart';
-import 'package:toplearth/core/provider/base_connect.dart';
 import 'package:toplearth/core/provider/base_socket.dart';
-import 'package:toplearth/core/wrapper/response_wrapper.dart';
 import 'package:toplearth/core/wrapper/result_wrapper.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
-import 'package:toplearth/data/provider/matching/matching_remote_provider.dart';
 import 'package:toplearth/domain/condition/matching/designated_matching_condition.dart';
 import 'package:toplearth/domain/condition/matching/end_vs_matching_condition.dart';
 import 'package:toplearth/domain/condition/matching/random_matching_condition.dart';
 import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/domain/entity/matching/matching_status_state.dart';
-import 'package:toplearth/domain/entity/plogging/plogging_recent.state.dart';
 import 'package:toplearth/domain/entity/plogging/recent_matching_info_state.dart';
-import 'package:toplearth/domain/type/e_group_status.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
 import 'package:toplearth/domain/usecase/matching/matching_by_designated_usecase.dart';
 import 'package:toplearth/domain/usecase/matching/matching_by_random_usecase.dart';
@@ -43,14 +37,15 @@ class MatchingGroupViewModel extends GetxController {
   late final RxInt teamId = 0.obs; // 관리되는 팀 ID
   late final RxInt opponentTeamId = 0.obs; // 관리되는 상대 팀 ID
   late final Rx<EMatchingStatus> matchingStatus = EMatchingStatus.DEFAULT.obs;
-  late final RxList<RecentMatchingInfoState> recentPloggingList = <RecentMatchingInfoState>[].obs;
+  late final Rx<RecentMatchingInfoState> recentPloggingList =
+      RecentMatchingInfoState(recentMatchingInfo: []).obs;
   RxBool isWebSocketConnected = false.obs;
   Rx<TeamInfoState> teamInfoState = TeamInfoState.initial().obs;
   /* ------------------------------------------------------ */
   /* Lifecycle Methods ------------------------------------ */
   /* ------------------------------------------------------ */
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     // DI 주입
     _matchingByRandomUseCase = Get.find<MatchingByRandomUseCase>();
@@ -62,7 +57,6 @@ class MatchingGroupViewModel extends GetxController {
 
     _rootViewModel = Get.find<RootViewModel>();
 
-
     // RootViewModel에서 teamInfoState 상태 구독
     ever(_rootViewModel.teamInfoState, (TeamInfoState newTeamState) {
       teamInfoState.value = newTeamState;
@@ -70,7 +64,7 @@ class MatchingGroupViewModel extends GetxController {
     });
 
     // Fetch recent plogging information
-    getRecentPlogging();
+    await getRecentPlogging();
 
     // 매칭 상태 업데이트
     ever(_rootViewModel.matchingStatusState,
@@ -154,14 +148,17 @@ class MatchingGroupViewModel extends GetxController {
 
   Future<ResultWrapper> getRecentPlogging() async {
     StateWrapper<RecentMatchingInfoState> state =
-    await _matchingRecentPloggingUseCase.execute();
+        await _matchingRecentPloggingUseCase.execute();
 
     if (state.success && state.data != null) {
       // 상태를 업데이트
-      recentPloggingList.value = state.data!.recentMatchingInfo!.cast<RecentMatchingInfoState>();
+      LogUtil.debug("현재 최근 플로깅 데이터 존재합니다");
+      recentPloggingList.value = state.data!;
+      LogUtil.debug(state.data);
     } else {
       // 빈 리스트로 초기화
-      recentPloggingList.value = [];
+      recentPloggingList.value =
+          RecentMatchingInfoState(recentMatchingInfo: []);
     }
 
     return ResultWrapper(
@@ -169,7 +166,6 @@ class MatchingGroupViewModel extends GetxController {
       message: state.message,
     );
   }
-
 
   setMatchingStatus(EMatchingStatus status) {
     matchingStatus.value = status;
