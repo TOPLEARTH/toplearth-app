@@ -1,3 +1,4 @@
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/domain/usecase/user/read_user_state_usecase.dart';
 import 'package:toplearth/presentation/view_model/group/group_binding.dart';
