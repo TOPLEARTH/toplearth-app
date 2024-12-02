@@ -17,4 +17,26 @@ abstract class MatchingRemoteProvider {
   // 매칭 종료
   // /api/v1/matching/end
   Future<ResponseWrapper> endMatching();
+
+  // 매칭 상태 조회
+  // /api/v1/matching/status
+  Future<ResponseWrapper> getMatchingStatus();
+
+  // 최근 플로깅 조회
+  // /api/v1/matching/plogging
+
+
+  // 대결 종료
+  // /api/v1/matching/${matchingId}/end
+  Future<ResponseWrapper> endVsMatching({
+    required int matchingId,
+    required int competitionScore,
+    required int totalPickUpCnt,
+    required bool winFlag,
+});
+
+  // 최근 플로깅 조회
+  // /api/v1/matching/plogging
+  Future<ResponseWrapper> getRecentPlogging();
+
 }
