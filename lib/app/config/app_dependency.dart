@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:toplearth/core/provider/base_socket.dart';
 import 'package:toplearth/data/provider/auth/auth_remote_provider.dart';
 import 'package:toplearth/data/provider/auth/auth_remote_provider_impl.dart';
 import 'package:toplearth/data/provider/group/group_remote_provider.dart';
@@ -27,6 +28,7 @@ class AppDependency extends Bindings {
 
 
     // Add your provider dependencies here
+    Get.lazyPut(()=>WebSocketController());
     Get.lazyPut<AuthRemoteProvider>(() => AuthRemoteProviderImpl());
     Get.lazyPut<UserRemoteProvider>(() => UserRemoteProviderImpl());
     Get.lazyPut<GroupRemoteProvider>(() => GroupRemoteProviderImpl());

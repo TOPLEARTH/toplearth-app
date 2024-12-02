@@ -13,10 +13,15 @@ abstract class AppRoutes {
   static const String PLOGGING_PROGRESS = '/plogging-progress';    // 진행 중 화면
   static const String PLOGGING_VERIFY = '/plogging-verify';        // 끝난 후 인증 화면
   static const String PLOGGING_LABELING = '/plogging-labeling';
+  static const String PLOGGING_SHARE = '/plogging-share';
+
+  // 스토어 상세
+  static const String STORE_DETAIL = '/store-detail';
 
   // 그룹 생성, 그룹 참여, 그룹 생성(가입) 완료
   static const String GROUP_CREATE = '/group-create';
   static const String GROUP_SEARCH = '/group-search';
+  static const String GROUP_SELECT = '/group-select';
   static const String GROUP_CREATE_COMPLETE = '/group-create-complete';
   static const String GROUP_JOIN = '/group-join';
   static const String GROUP_COMPLETE = '/group-complete';
