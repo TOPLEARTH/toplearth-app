@@ -30,7 +30,6 @@ class HomeViewModel extends GetxController {
 
   late final RxBool _isLoading;
 
-
   /* 전역 상태로 관리할 위치 정보 */
   RxDouble latitude = 0.0.obs;
   RxDouble longitude = 0.0.obs;
@@ -47,8 +46,6 @@ class HomeViewModel extends GetxController {
   RegionRankingInfoState get regionRankingInfoState =>
       _regionRankingInfoState.value;
   HomeInfoState get homeInfoState => _homeInfoState.value;
-  bool get isLoading => _isLoading.value;
-
   @override
   void onInit() {
     super.onInit();
@@ -85,7 +82,6 @@ class HomeViewModel extends GetxController {
     } finally {
       isLoading.value = false; // 로딩 종료
     }
-
   }
 
   // 위치 조회 및 RootViewModel 업데이트
@@ -117,8 +113,7 @@ class HomeViewModel extends GetxController {
 
       // 지역 정보 업데이트
       await _fetchRegionInfo(position.latitude, position.longitude);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   // 위도/경도를 기반으로 지역 및 regionId 조회
