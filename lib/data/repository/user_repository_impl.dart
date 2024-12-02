@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:toplearth/app/utility/log_util.dart';
 import 'package:toplearth/core/wrapper/response_wrapper.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/data/provider/user/user_remote_provider.dart';
@@ -19,21 +20,17 @@ class UserRepositoryImpl extends GetxService implements UserRepository {
   Future<StateWrapper<BootstrapState>> readBootStrapData() async {
     ResponseWrapper response = await _userRemoteProvider.getBootStrapInformation();
 
-    StateWrapper<BootstrapState> state;
-
-    if (response.success) {
-      state = StateWrapper<BootstrapState>(
-        success: response.success,
-        message: response.message,
-        data: BootstrapState.fromJson(response.data!),
-      );
-    } else {
-      state = StateWrapper<BootstrapState>(
-        success: response.success,
+    if (!response.success) {
+      return StateWrapper(
+        success: false,
         message: response.message,
       );
     }
 
-    return state;
+    LogUtil.info('Bootstrap data: ${response.data}');
+
+    BootstrapState state = BootstrapState.fromJson(response.data!);
+
+    return StateWrapper.fromResponseAndState(response, state);
   }
 }

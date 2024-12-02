@@ -23,7 +23,7 @@ class GroupViewModel extends GetxController {
   MonthlyGroupState? get currentMonthData {
     final currentMonth =
         DateTime.now().toIso8601String().substring(0, 7); // e.g., "2024-12"
-    return teamInfoState.monthlyData[currentMonth];
+    return teamInfoState.monthlyData![currentMonth];
   }
 
   @override
@@ -40,7 +40,7 @@ class GroupViewModel extends GetxController {
     ever(_rootViewModel.isBootstrapLoaded, (isLoaded) {
       if (isLoaded) {
         // Bootstrap 데이터가 로드된 이후 업데이트
-        _teamInfoState.value = _rootViewModel.teamInfoState; //2
+        // _teamInfoState.value = _rootViewModel.teamInfoState.value;
         debugPrint('debug in groupViewModel: ${teamInfoState.teamName}');
         debugPrint('debug in groupViewModel: ${teamInfoState.teamCode}');
       }

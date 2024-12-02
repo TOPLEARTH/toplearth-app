@@ -6,7 +6,7 @@ import 'package:toplearth/core/wrapper/response_wrapper.dart';
 import 'package:toplearth/data/factory/storage_factory.dart'; // FCM 토큰 가져오기 위해 추가
 import 'package:toplearth/core/provider/base_socket.dart';
 
-class AuthRemoteProviderImpl extends BaseConnect with WebSocketMixin implements AuthRemoteProvider {
+class AuthRemoteProviderImpl extends BaseConnect implements AuthRemoteProvider {
   @override
   Future<ResponseWrapper> loginByDefault({
     required String email,

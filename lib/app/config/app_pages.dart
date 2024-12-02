@@ -7,7 +7,12 @@ import 'package:toplearth/presentation/view/login/login_screen.dart';
 import 'package:toplearth/presentation/view/matching/matching_group_create_complete_screen.dart';
 import 'package:toplearth/presentation/view/matching/matching_group_create_screen.dart';
 import 'package:toplearth/presentation/view/matching/matching_group_search_screen.dart';
+import 'package:toplearth/presentation/view/matching/matching_group_select_screen.dart';
 import 'package:toplearth/presentation/view/on_boarding/on_boarding_screen.dart';
+import 'package:toplearth/presentation/view/plogging/plogging_labeling_screen.dart';
+import 'package:toplearth/presentation/view/plogging/plogging_share_screen.dart';
+import 'package:toplearth/presentation/view/store/store_detail_screen.dart';
+import 'package:toplearth/presentation/view/store/store_screen.dart';
 // import 'package:toplearth/presentation/view/root/test_code_screen.dart';
 import 'package:toplearth/presentation/view_model/home/home_binding.dart';
 import 'package:toplearth/presentation/view_model/legacy/legacy_binding.dart';
@@ -15,7 +20,10 @@ import 'package:toplearth/presentation/view_model/login/login_binding.dart';
 import 'package:toplearth/presentation/view_model/matching_group_complete/matching_group_create_complete_binding.dart';
 import 'package:toplearth/presentation/view_model/matching_group_create/matching_group_create_binding.dart';
 import 'package:toplearth/presentation/view_model/matching_group_search/matching_group_search_binding.dart';
+import 'package:toplearth/presentation/view_model/matching_group_select/matching_group_select_binding.dart';
+import 'package:toplearth/presentation/view_model/plogging/plogging_binding.dart';
 import 'package:toplearth/presentation/view_model/root/root_binding.dart';
+import 'package:toplearth/presentation/view_model/store/store_binding.dart';
 import 'package:toplearth/test_code/image_upload_binding.dart';
 import 'package:toplearth/test_code/test_code_screen.dart';
 import 'package:toplearth/presentation/view/root/root_screen.dart';
@@ -71,6 +79,21 @@ abstract class AppPages {
       name: AppRoutes.GROUP_CREATE_COMPLETE,
       page: () => const MatchingGroupCreateCompleteScreen(),
       binding: MatchingGroupCreateCompleteBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.PLOGGING_LABELING,
+      page: () => PloggingLabelingScreen(),
+      binding: PloggingBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.STORE_DETAIL,
+      page: () => StoreDetailScreen(),
+      binding: StoreBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.PLOGGING_SHARE,
+      page: () => PloggingShareScreen(),
+      binding: PloggingBinding(),
     ),
   ];
 }

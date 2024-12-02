@@ -150,7 +150,7 @@ class LoginViewModel extends GetxController {
       return ResultWrapper(success: result.success, message: result.message);
     } catch (e) {
       _isEnableGreyBarrier.value = false;
-      return ResultWrapper(success: false, message: 'Apple 로그인 실패: $e');
+      return ResultWrapper(success: false, message: 'Apple 로그인 실패');
     }
   }
 

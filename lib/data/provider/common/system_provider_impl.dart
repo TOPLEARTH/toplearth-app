@@ -129,4 +129,23 @@ class SystemProviderImpl implements SystemProvider {
 
     _fcmToken = token;
   }
+
+  @override
+  String getMatchingId() {
+    return _normalStorage.read(SystemProviderExt.matchingId) ?? '';
+  }
+
+  @override
+  Future<void> setMatchingId(String matchingId) async {
+    await _normalStorage.write(SystemProviderExt.matchingId, matchingId);
+  }
+
+  @override
+  Future<void> deallocateMatchingId() async {
+    await _normalStorage.remove(SystemProviderExt.matchingId);
+  }
+
+  @override
+  // TODO: implement matchingId
+  String get matchingId => throw UnimplementedError();
 }

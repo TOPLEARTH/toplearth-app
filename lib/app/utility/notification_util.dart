@@ -1,20 +1,28 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart';
+import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/utility/log_util.dart';
+import 'package:toplearth/data/factory/storage_factory.dart';
+import 'package:toplearth/data/provider/common/system_provider.dart';
+import 'package:toplearth/domain/entity/matching/matching_status_state.dart';
+import 'package:toplearth/domain/type/e_matching_status.dart';
+import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
+import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 
 abstract class NotificationUtil {
   static final FlutterLocalNotificationsPlugin _plugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   static bool isFlutterLocalNotificationsInitialized = false;
 
   static const AndroidNotificationDetails
-  _androidPlatformLocalChannelSpecifics = AndroidNotificationDetails(
+      _androidPlatformLocalChannelSpecifics = AndroidNotificationDetails(
     'tolpearth_local_channel_id',
     'Toplearth',
     channelDescription: 'Toplearth Channel',
@@ -24,7 +32,7 @@ abstract class NotificationUtil {
   );
 
   static const AndroidNotificationDetails
-  _androidPlatformRemoteChannelSpecifics = AndroidNotificationDetails(
+      _androidPlatformRemoteChannelSpecifics = AndroidNotificationDetails(
     'toplearth_remote_channel_id',
     'Toplearth',
     channelDescription: 'Toplearth Channel',
@@ -34,7 +42,7 @@ abstract class NotificationUtil {
   );
 
   static const NotificationDetails _platformLocalChannelSpecifics =
-  NotificationDetails(
+      NotificationDetails(
     android: _androidPlatformLocalChannelSpecifics,
     iOS: DarwinNotificationDetails(
       badgeNumber: 1,
@@ -42,7 +50,7 @@ abstract class NotificationUtil {
   );
 
   static const NotificationDetails _platformRemoteChannelSpecifics =
-  NotificationDetails(
+      NotificationDetails(
     android: _androidPlatformRemoteChannelSpecifics,
     iOS: DarwinNotificationDetails(
       badgeNumber: 1,
@@ -51,10 +59,10 @@ abstract class NotificationUtil {
 
   static Future<void> initialize() async {
     AndroidInitializationSettings initializationSettingsAndroid =
-    const AndroidInitializationSettings('mipmap/ic_launcher');
+        const AndroidInitializationSettings('mipmap/ic_launcher');
 
     DarwinInitializationSettings initializationSettingsIOS =
-    const DarwinInitializationSettings(
+        const DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
@@ -80,7 +88,7 @@ abstract class NotificationUtil {
 
     await _plugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     // iOS foreground notification 권한
@@ -123,7 +131,7 @@ abstract class NotificationUtil {
         _platformLocalChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
+            UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
       );
     } else {
@@ -132,18 +140,46 @@ abstract class NotificationUtil {
   }
 
   @pragma('vm:entry-point')
-  static Future<void> onBackgroundHandler(
-      RemoteMessage message,
-      ) async {
-    LogUtil.info('onBackgroundHandler : $message');
+  static Future<void> onBackgroundHandler(RemoteMessage message) async {
+    LogUtil.info('onBackgroundHandler: $message');
+
+    if (message.data.isNotEmpty) {
+      if (message.data.containsKey('mingiId')) {
+        // First request
+        Get.find<MatchingGroupViewModel>().getMatchingStatus();
+        // Second request after 4 seconds
+        Future.delayed(const Duration(seconds: 4), () {
+          Get.find<MatchingGroupViewModel>().getMatchingStatus();
+          print("Second background request sent.");
+        });
+      }
+    }
   }
 
   static void showFlutterNotification(RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
 
+    // Access SystemProvider via StorageFactory
+    final systemProvider = StorageFactory.systemProvider;
+    final matchingGroupVM = Get.find<MatchingGroupViewModel>();
+    final rootVM = Get.find<RootViewModel>();
+
+    if (message.data.containsKey('matchingId')) {
+      print('matchingId: ${message.data['matchingId']}');
+
+      // Update matching status
+      matchingGroupVM.setMatchingStatus(EMatchingStatus.MATCHED);
+      rootVM.matchingStatusState.value = MatchingStatusState(
+        status: EMatchingStatus.MATCHED,
+      );
+
+      // Set matchingId
+      systemProvider.setMatchingId(message.data['matchingId']);
+    }
+
+    // Show notification if applicable
     if (notification != null && android != null) {
-      // 웹이 아니면서 안드로이드이고, 알림이 있는경우
       _plugin.show(
         notification.hashCode,
         notification.title,
@@ -157,7 +193,7 @@ abstract class NotificationUtil {
     // Current Time
     DateTime localNow = DateTime.now();
     DateTime localWhen =
-    DateTime(localNow.year, localNow.month, localNow.day, hour, minute);
+        DateTime(localNow.year, localNow.month, localNow.day, hour, minute);
 
     // UTC Time
     TZDateTime now = TZDateTime.from(localNow, tz.local);

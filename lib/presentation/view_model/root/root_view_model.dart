@@ -14,11 +14,21 @@ import 'package:toplearth/domain/entity/global/legacy_info_state.dart';
 import 'package:toplearth/domain/entity/global/region_ranking_info_state.dart';
 import 'package:toplearth/domain/entity/group/team_info_state.dart';
 import 'package:toplearth/domain/entity/home/home_info_state.dart';
+import 'package:toplearth/domain/entity/matching/matching_real_time_info_state.dart';
+import 'package:toplearth/domain/entity/matching/matching_status_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_info_state.dart';
 import 'package:toplearth/domain/entity/quest/quest_info_state.dart';
 import 'package:toplearth/domain/entity/user/boot_strap_state.dart';
 import 'package:toplearth/domain/entity/user/user_state.dart';
+import 'package:toplearth/domain/type/e_matching_status.dart';
+import 'package:toplearth/domain/usecase/matching/matching_status_usecase.dart';
 import 'package:toplearth/domain/usecase/user/read_user_state_usecase.dart';
+
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
+
 
 class RootViewModel extends GetxController {
   /* ------------------------------------------------------ */
@@ -30,12 +40,13 @@ class RootViewModel extends GetxController {
   /* -------------------- DI Fields ----------------------- */
   /* ------------------------------------------------------ */
   late final ReadBootStrapUseCase _readBootStrapUseCase;
+  late final MatchingStatusUseCase _matchingStatusUseCase;
 
   /* ------------------------------------------------------ */
   /* ----------------- Private Fields --------------------- */
   /* ------------------------------------------------------ */
   late Rx<DateTime> _currentAt;
-  late final RxInt _selectedIndex;
+  late final RxInt _selectedIndex = RxInt(2);
   late final Rx<UserState> _userState;
   late final Rx<QuestInfoState> _questInfoState;
   late final Rx<TeamInfoState> _teamInfoState;
@@ -43,34 +54,48 @@ class RootViewModel extends GetxController {
   late final Rx<LegacyInfoState> _legacyInfoState;
   late final Rx<RegionRankingInfoState> _regionRankingInfoState;
   late final Rx<HomeInfoState> _homeInfoState;
+  late final Rx<MatchingRealTimeInfoState> _matchingRealTimeInfoState;
+
   /* ------------------------------------------------------ */
   /* ----------------- Public Fields ---------------------- */
   /* ------------------------------------------------------ */
   // DateTime get currentAt => _currentAt.value;
   int get selectedIndex => _selectedIndex.value;
+  late final EMatchingStatus matchingStatus = EMatchingStatus.WAITING;
+
+  late final Rx<MatchingStatusState> matchingStatusState = MatchingStatusState(
+    status: EMatchingStatus.WAITING,
+  ).obs;
+
+
 
   UserState get userState => _userState.value;
   QuestInfoState get questInfoState => _questInfoState.value;
-  TeamInfoState get teamInfoState => _teamInfoState.value;
+  Rx<TeamInfoState> teamInfoState = TeamInfoState.initial().obs;
   PloggingInfoState get ploggingInfoState => _ploggingInfoState.value;
   LegacyInfoState get legacyInfoState => _legacyInfoState.value;
   RegionRankingInfoState get regionRankingInfoState =>
       _regionRankingInfoState.value;
   HomeInfoState get homeInfoState => _homeInfoState.value;
-  RxBool isBootstrapLoaded = false.obs;
+  MatchingRealTimeInfoState get matchingRealTimeInfoState =>
+      _matchingRealTimeInfoState.value;
 
+  RxBool isBootstrapLoaded = false.obs;
   // 전역 상태로 관리할 위치 정보
   RxDouble latitude = 0.0.obs;
   RxDouble longitude = 0.0.obs;
   RxString regionName = '현재 위치를 조회해요!'.obs; // 초기 상태
   RxInt regionId = 0.obs;
-
   @override
   void onInit() async {
     super.onInit();
 
     // Dependency Injection
     _readBootStrapUseCase = Get.find<ReadBootStrapUseCase>();
+    _matchingStatusUseCase = Get.find<MatchingStatusUseCase>();
+
+    // // 초기 매칭 상태 조회
+    // await fetchMatchingStatus();
 
     _userState = UserState.initial().obs;
     _questInfoState = QuestInfoState.initial().obs;
@@ -79,15 +104,45 @@ class RootViewModel extends GetxController {
     _legacyInfoState = LegacyInfoState.initial().obs;
     _regionRankingInfoState = RegionRankingInfoState.initial().obs;
     _homeInfoState = HomeInfoState.initial().obs;
-    _selectedIndex = 2.obs;
+    _matchingRealTimeInfoState = MatchingRealTimeInfoState.initial().obs;
+
 
     // FCM Setting
     FirebaseMessaging.onMessage
         .listen(NotificationUtil.showFlutterNotification);
     FirebaseMessaging.onBackgroundMessage(NotificationUtil.onBackgroundHandler);
-
     // Private Fields
     _currentAt = DateTime.now().obs;
+
+    fetchMatchingStatus();
+  }
+
+  // 매칭 상태 조회
+  Future<void> fetchMatchingStatus() async {
+    final StateWrapper<MatchingStatusState> state =
+        await _matchingStatusUseCase.execute();
+
+    if (state.success) {
+      debugPrint('매칭 상태 조회 성공');
+      matchingStatusState.value = MatchingStatusState(
+        status: state.data!.status,
+      );
+      debugPrint('MatchingStatusState: ${matchingStatusState.value.status}');
+    } else {
+      debugPrint('매칭 상태 조회 실패: ${state.message}');
+    }
+  }
+
+// RootViewModel
+  void updateTeamIdInMatchingGroupViewModel() {
+    // teamId를 MatchingGroupViewModel로 전달
+    final matchingGroupViewModel = Get.find<MatchingGroupViewModel>();
+    matchingGroupViewModel.setTeamId(teamInfoState.value.teamId!);
+
+    // 상태가 변할 때마다 MatchingGroupViewModel에 전파
+    ever(teamInfoState, (TeamInfoState newTeamState) {
+      matchingGroupViewModel.setTeamId(newTeamState.teamId!);
+    });
   }
 
   // 위치 권한 요청 및 현재 위치 가져오기
@@ -121,6 +176,7 @@ class RootViewModel extends GetxController {
 
     latitude.value = position.latitude;
     longitude.value = position.longitude;
+
 
     // 지역 정보 가져오기
     await _fetchRegionInfo(position.latitude, position.longitude);
@@ -161,6 +217,7 @@ class RootViewModel extends GetxController {
 
   @override
   void onReady() async {
+
     await fetchBootstrapInformation();
     super.onReady();
   }
@@ -169,13 +226,22 @@ class RootViewModel extends GetxController {
     StateWrapper<BootstrapState> state = await _readBootStrapUseCase.execute();
 
     if (state.success) {
+      // debugPrint('bootstrap: ${state.data!.userInfo}');
+
       _userState.value = state.data!.userInfo;
+      _homeInfoState.value = state.data!.homeInfo;
+      teamInfoState.value = state.data?.teamInfo ?? TeamInfoState.initial();
+      if (state.data?.teamInfo != null) {
+        updateTeamIdInMatchingGroupViewModel();
+      }
       _questInfoState.value = state.data!.questInfo;
-      _teamInfoState.value = state.data!.teamInfo!;
       _ploggingInfoState.value = state.data!.ploggingInfo;
       _legacyInfoState.value = state.data!.legacyInfo;
       _regionRankingInfoState.value = state.data!.regionRankingInfo;
       _homeInfoState.value = state.data!.homeInfo;
+      if (state.data?.matchingRealTimeInfo != null) {
+        _matchingRealTimeInfoState.value = state.data!.matchingRealTimeInfo!;
+      }
       debugPrint('PloggingInfo: ${_ploggingInfoState.value}');
       isBootstrapLoaded.value = true; // 로드 완료 상태 업데이트
     }
@@ -232,13 +298,10 @@ Future<String?> fetchRegionFromNaverAPI(double lat, double lng) async {
 
     try {
       final String region = data["results"][0]["region"]["area2"]["name"];
-      print("Extracted Region from Naver API: $region");
       return region; // 지역구 반환
     } catch (e) {
-      print("Error parsing Naver API response: $e");
     }
   } else {
-    print("Naver API request failed with status: ${response.statusCode}");
   }
   return null;
 }

@@ -7,7 +7,7 @@ class PloggingState {
   final int duration; // duration in minutes
   final int trashCnt;
   final String startedAt;
-  final String endedAt;
+  final String? endedAt;
   final PloggingTeamInfoState ploggingTeamInfo;
   final List<PloggingImageState> ploggingImageList;
 
@@ -17,7 +17,7 @@ class PloggingState {
     required this.duration,
     required this.trashCnt,
     required this.startedAt,
-    required this.endedAt,
+    this.endedAt,
     required this.ploggingTeamInfo,
     required this.ploggingImageList,
   });

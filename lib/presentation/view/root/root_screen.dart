@@ -6,6 +6,7 @@ import 'package:toplearth/presentation/view/home/home_screen.dart';
 import 'package:toplearth/presentation/view/matching/matching_screen.dart';
 import 'package:toplearth/presentation/view/my_page/my_page_screen.dart';
 import 'package:toplearth/presentation/view/root/widget/custom_bottom_navigation_bar/custom_bottom_navigation_bar.dart';
+import 'package:toplearth/presentation/view/store/store_screen.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/view/plogging/plogging_screen.dart';
 
@@ -22,6 +23,7 @@ class RootScreen extends BaseScreen<RootViewModel> {
           MatchingScreen(),
           HomeScreen(),
           PloggingScreen(),
+          // StoreScreen(),
           GroupScreen(),
         ],
       ),

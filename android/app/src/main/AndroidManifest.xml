@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <application
-        android:label="toplearth"
+        android:label="투플러스"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <!-- 카카오 로그인 설정 -->

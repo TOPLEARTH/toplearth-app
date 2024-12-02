@@ -5,6 +5,8 @@ import 'package:toplearth/core/provider/base_connect.dart';
 import 'package:toplearth/core/wrapper/response_wrapper.dart';
 import 'package:toplearth/data/provider/plogging/plogging_remote_provider.dart';
 
+import 'package:intl/intl.dart'; // 날짜 형식화를 위해 필요
+
 class PloggingRemoteProviderImpl extends BaseConnect
     implements PloggingRemoteProvider {
   @override
@@ -15,13 +17,16 @@ class PloggingRemoteProviderImpl extends BaseConnect
     required List<String> labels,
   }) async {
     try {
-      // File을 바이트로 변환하여 MultipartFile 생성
+      // 현재 시간 기반 파일명 생성
+      final now = DateTime.now();
+      final formattedTime = DateFormat('yyyyMMdd_HHmmss').format(now);
 
+      // File을 바이트로 변환하여 MultipartFile 생성
       final formData = FormData({
         'ploggingImage': MultipartFile(
-          ploggingImage.readAsBytesSync(), // 바이트 배열로 변환
-          filename: 'ploggingImage.jpg',
-          contentType: 'image/jpeg', // 적절한 Content-Type 설정
+          ploggingImage.readAsBytesSync(),
+          filename: 'ploggingImage_$formattedTime.jpg',
+          contentType: 'image/jpeg',
         ),
         'ploggingImageIds': ploggingImageIds,
         'labels': labels,
@@ -52,11 +57,15 @@ class PloggingRemoteProviderImpl extends BaseConnect
     required double longitude,
   }) async {
     try {
+      // 현재 시간 기반 파일명 생성
+      final now = DateTime.now();
+      final formattedTime = DateFormat('yyyyMMdd_HHmmss').format(now);
+
       // File을 바이트로 변환하여 MultipartFile 생성
       final formData = FormData({
         'ploggingImage': MultipartFile(
           ploggingImage.readAsBytesSync(),
-          filename: 'ploggingImage.jpg',
+          filename: 'ploggingImage_$formattedTime.jpg',
           contentType: 'image/jpeg',
         ),
         'latitude': latitude.toString(),
@@ -95,7 +104,7 @@ class PloggingRemoteProviderImpl extends BaseConnect
     return ResponseWrapper.fromJson(response.body);
   }
 
-  // 팀 플로깅 시작
+  // 팀 플로깅 종료
   @override
   Future<ResponseWrapper> finishPlogging({
     required int ploggingId,

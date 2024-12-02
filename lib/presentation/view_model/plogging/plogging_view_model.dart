@@ -7,36 +7,41 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/condition/plogging/finish_plogging_condition.dart';
 import 'package:toplearth/domain/condition/plogging/plogging_labeling_condition.dart';
 import 'package:toplearth/domain/condition/plogging/start_individual_plogging_condition.dart';
+import 'package:toplearth/domain/entity/matching/matching_status_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_finish_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_image_list_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_start_individual_state.dart';
 import 'package:toplearth/domain/type/e_labeling_status.dart';
+import 'package:toplearth/domain/type/e_matching_status.dart';
 import 'package:toplearth/domain/usecase/plogging/finish_plogging_usecase.dart';
 import 'package:toplearth/domain/usecase/plogging/labeling_plogging_usecase.dart';
 import 'package:toplearth/domain/usecase/plogging/start_individual_plogging_usecase.dart';
 import 'package:toplearth/presentation/view/plogging/plogging_path_painter.dart';
 import 'dart:io';
-import 'package:get/get.dart';
 import 'package:toplearth/core/wrapper/result_wrapper.dart';
 import 'package:toplearth/domain/condition/plogging/upload_plogging_image_condition.dart';
 import 'package:toplearth/domain/usecase/plogging/upload_plogging_image_usecase.dart';
+import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
+import 'package:toplearth/presentation/view_model/plogging/MapHelper.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
-import 'dart:typed_data';
 
 class PloggingViewModel extends GetxController {
   /* ------------------------------------------------------ */
   /* DI Fields -------------------------------------------- */
   /* ------------------------------------------------------ */
+
   late final UploadPloggingImageUseCase _uploadPloggingImageUseCase;
   late final StartIndividualPloggingUseCase _startIndividualPloggingUseCase;
   late final FinishPloggingUseCase _finishPloggingUsecase;
   late final LabelingPloggingUseCase _labelingPloggingUseCase;
   late final RootViewModel _rootViewModel;
+  Rx<NLatLng> currentLocation = NLatLng(0.0, 0.0).obs;
   final Rx<PloggingImageListState> _ploggingImageListState =
       PloggingImageListState(ploggingImages: []).obs;
   // ScreenshotController 추가
@@ -44,13 +49,17 @@ class PloggingViewModel extends GetxController {
   /* ------------------------------------------------------ */
   /* Private Fields --------------------------------------- */
   /* ------------------------------------------------------ */
+  final RxBool showPhotoMarkers = false.obs; // 사진 기반 마커 가시성 상태
+  final RxList<NMarker> photoMarkers = <NMarker>[].obs; // 사진 마커 리스트
+
   late NaverMapController _mapController;
+  RxBool isLocationEnabled = false.obs;
   Timer? _timer;
   NLatLng? _currentLocation;
   final Rx<File?> selectedImage = Rx<File?>(null);
   final RxBool isLoading = false.obs;
   //regionId
-  late int regionId;
+  int regionId = 14;
   // ploggingId
   late int ploggingId;
 
@@ -59,7 +68,7 @@ class PloggingViewModel extends GetxController {
   final int duration = 3600; // 초
   final int pickUpCnt = 15; // 수거 갯수
   final int burnedCalories = 200; // 칼로리
-  final Rx<File?> ploggingImage = File('assets/images/test_image.jpg').obs;
+  final Rx<File?> ploggingImage = File('assets/icons/clean_marker.png').obs;
 
   /* ------------------------------------------------------ */
   /* Observable Fields ------------------------------------ */
@@ -94,6 +103,10 @@ class PloggingViewModel extends GetxController {
       regionId = newRegionId;
       debugPrint("Updated regionId in PloggingViewModel: $regionId");
     });
+
+    // RootViewModel의 위치 변경을 감지하여 currentLocation 업데이트
+    ever(_rootViewModel.latitude, (_) => _updateCurrentLocation());
+    ever(_rootViewModel.longitude, (_) => _updateCurrentLocation());
   }
 
   @override
@@ -106,10 +119,24 @@ class PloggingViewModel extends GetxController {
     selectedImage.value = image;
   }
 
+  /// 위치 초기화 메서드
+  Future<void> initializeCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      currentLocation.value = NLatLng(position.latitude, position.longitude);
+    } catch (e) {
+      debugPrint('위치 정보를 불러오는 데 실패했습니다: $e');
+      // 기본 위치: 서울
+      currentLocation.value = NLatLng(37.5665, 126.9780);
+    }
+  }
+
   Future<ResultWrapper> startIndividualPlogging() async {
     StateWrapper<PloggingStartIndividualState> state =
         await _startIndividualPloggingUseCase
-            .execute(StartIndividualPloggingCondition(regionId: regionId));
+            .execute(StartIndividualPloggingCondition(regionId: 14));
     ploggingId = state.data!.ploggingId;
 
     return ResultWrapper(
@@ -128,8 +155,34 @@ class PloggingViewModel extends GetxController {
   //   );
   // }
 
+  Future<void> handleFinishPlogging() async {
+    final result = await finishPlogging();
+
+    if (result.success) {
+      debugPrint(
+          "FinishPlogging 성공: ${_ploggingImageListState.value.ploggingImages}");
+
+      // 라벨링을 위한 이미지 데이터 준비
+      final ploggingImages = _ploggingImageListState.value.ploggingImages
+          .map((image) => {
+                'ploggingImageId': image.ploggingImageId,
+                'imageUrl': image.imageUrl,
+                'createdAt': image.createdAt,
+              })
+          .toList();
+
+      // 라벨링 화면으로 데이터 전달
+      Get.toNamed(
+        AppRoutes.PLOGGING_LABELING,
+        arguments: {'ploggingImages': ploggingImages},
+      );
+    } else {
+      debugPrint("FinishPlogging 실패: ${result.message}");
+      Get.snackbar('오류', result.message ?? '플로깅 종료 중 문제가 발생했습니다.');
+    }
+  }
+
   Future<ResultWrapper> finishPlogging() async {
-    // 플로깅 종료 API 호출
     StateWrapper<PloggingImageListState> state =
         await _finishPloggingUsecase.execute(FinishPloggingCondition(
       ploggingId: ploggingId,
@@ -140,15 +193,10 @@ class PloggingViewModel extends GetxController {
         burnedCalories: burnedCalories,
       ),
     ));
-    // 상태 업데이트
+
     if (state.success && state.data != null) {
-      _ploggingImageListState.value = state.data!; // 상태 업데이트
-      debugPrint(
-          'FinishPlogging Response Data: ${state.data!.ploggingImages.first}');
-      for (var image in _ploggingImageListState.value.ploggingImages) {
-        debugPrint(
-            'Image ID: ${image.ploggingImageId}, URL: ${image.imageUrl}');
-      }
+      _ploggingImageListState.value = state.data!;
+      debugPrint('FinishPlogging Data: ${state.data!.ploggingImages}');
     } else {
       debugPrint('FinishPlogging Failed: ${state.message}');
     }
@@ -159,57 +207,44 @@ class PloggingViewModel extends GetxController {
     );
   }
 
-
-  Future<ResultWrapper> labelingPloggingImages() async {
-    if (ploggingImage.value == null) {
-      return ResultWrapper(
-        success: false,
-        message: '캡처된 이미지가 없습니다.',
-      );
-    }
-
-    // 이미지 ID 리스트와 라벨 리스트 매핑
-    final List<int> imageIds = _ploggingImageListState.value.ploggingImages
-        .map((e) => e.ploggingImageId!)
-        .toList();
-
-    // 예시: 모든 이미지에 동일한 라벨링 처리 (실제는 동적 구성 가능)
-    final List<String> labels = List.generate(
-        imageIds.length, (_) => ELabelingStatus.plastic.toString());
-
-    // 리스트 크기 확인
+  Future<ResultWrapper> labelingPloggingImages(
+      List<int> imageIds, List<String> labels, File screenshotFile) async {
     if (imageIds.length != labels.length) {
       return ResultWrapper(
-        success: false,
-        message: '이미지 ID와 라벨 리스트의 크기가 일치하지 않습니다.',
-      );
+          success: false, message: '이미지 ID와 라벨 리스트 크기가 일치하지 않습니다.');
     }
+
     try {
       StateWrapper<void> state = await _labelingPloggingUseCase.execute(
         PloggingLabelingCondition(
           ploggingId: ploggingId,
-          ploggingImage: ploggingImage.value!, // 캡처된 이미지
+          ploggingImage: screenshotFile, // Use the screenshot file here
           ploggingImageIds: imageIds,
           labels: labels,
         ),
       );
 
       if (!state.success) {
-        return ResultWrapper(
-          success: false,
-          message: state.message,
-        );
+        return ResultWrapper(success: false, message: state.message);
       }
 
-      return ResultWrapper(
-        success: true,
-        message: '라벨링이 성공적으로 처리되었습니다.',
-      );
+      return ResultWrapper(success: true, message: '라벨링 완료');
     } catch (e) {
-      return ResultWrapper(
-        success: false,
-        message: '라벨링 처리 중 오류 발생: $e',
+      return ResultWrapper(success: false, message: '라벨링 처리 중 오류: $e');
+    }
+  }
+
+  Future<void> addMarkerAtCurrentLocationWithCoordinates(
+      double latitude, double longitude) async {
+    try {
+      await mapHelper.addCleanMarker(
+        latitude,
+        longitude,
       );
+
+      Get.snackbar('성공', '마커 추가 완료');
+    } catch (e) {
+      rethrow; // 에러를 상위로 전달
     }
   }
 
@@ -218,6 +253,8 @@ class PloggingViewModel extends GetxController {
       return ResultWrapper(success: false, message: '이미지를 선택해주세요.');
     }
     isLoading.value = true;
+
+    // 업로드 API 호출
     StateWrapper<void> state = await _uploadPloggingImageUseCase.execute(
       UploadPloggingImageCondition(
         ploddingImage: selectedImage.value!,
@@ -226,32 +263,76 @@ class PloggingViewModel extends GetxController {
         longitude: longitude,
       ),
     );
+
     isLoading.value = false;
 
-    return ResultWrapper(
-      success: state.success,
-      message: state.message,
-    );
+    if (state.success) {
+      try {
+        await addMarkerAtCurrentLocationWithCoordinates(latitude, longitude);
+        Get.snackbar('성공', '사진 업로드 및 마커 추가 성공!');
+        return ResultWrapper(success: true);
+      } catch (e) {
+        rethrow;
+      }
+    } else {
+      return ResultWrapper(success: false, message: state.message);
+    }
+  }
+
+  Future<void> togglePhotoMarkers() async {
+    // 사진 마커 가시성 상태 토글
+    showPhotoMarkers.toggle();
+
+    try {
+      if (showPhotoMarkers.value) {
+        // 사진 마커 표시
+        for (var marker in photoMarkers) {
+          await _mapController.addOverlay(marker); // 개별 마커 추가
+        }
+        Get.snackbar('마커 표시', '사진 기반 마커가 표시되었습니다.');
+      } else {
+        // 사진 마커 숨김
+        for (var marker in photoMarkers) {
+          await _mapController.deleteOverlay(marker.info); // 개별 마커 제거
+        }
+        Get.snackbar('마커 숨김', '사진 기반 마커가 숨겨졌습니다.');
+      }
+    } catch (e) {
+      Get.snackbar('오류', '사진 마커 처리 중 오류가 발생했습니다.');
+    }
   }
 
   Future<void> _checkLocationPermission() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      Get.snackbar("위치 서비스 비활성화", "위치 서비스를 활성화해주세요.");
+      return;
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+        Get.snackbar("위치 권한 필요", "위치 권한을 허용해주세요.");
       }
     }
+    if (permission == LocationPermission.deniedForever) {
+      Get.snackbar("위치 권한 필요", "앱 설정에서 위치 권한을 허용해주세요.");
+      return;
+    }
+
+    isLocationEnabled.value = true;
   }
+
+  final MapHelper mapHelper = MapHelper();
 
   void onMapReady(NaverMapController controller) {
     _mapController = controller;
-    _addTrashBinMarkers();
+    mapHelper.initialize(controller);
+    _mapController.getLocationTrackingMode();
+    mapHelper.addCurrentLocationMarker();
+    mapHelper.addTrashBinMarkers(); // Add trash bin markers
+    _updateCurrentLocation();
   }
 
   Future<void> startPlogging() async {
@@ -271,6 +352,17 @@ class PloggingViewModel extends GetxController {
         debugPrint("Failed to start plogging: ${state.message}");
         return; // 요청 실패 시 중단
       }
+
+      // MatchingGroupViewModel 및 RootViewModel의 상태 업데이트
+      final matchingGroupViewModel = Get.find<MatchingGroupViewModel>();
+      final rootViewModel = Get.find<RootViewModel>();
+
+      matchingGroupViewModel.setMatchingStatus(EMatchingStatus.PLOGGING);
+      rootViewModel.matchingStatusState.value = MatchingStatusState(
+        status: EMatchingStatus.PLOGGING,
+      );
+
+      debugPrint("Matching status updated to PLOGGING");
     } catch (e) {
       debugPrint("Error while starting plogging: $e");
       return; // 에러 발생 시 중단
@@ -364,23 +456,11 @@ class PloggingViewModel extends GetxController {
   }
 
   // _updateCurrentLocation 메서드 수정
-  Future<void> _updateCurrentLocation() async {
-    final newLocation = _currentLocation ?? const NLatLng(37.5665, 126.9780);
-    final nextLocation = _getNewLocationByDistance(newLocation, 300);
+  void _updateCurrentLocation() {
+    final double lat = _rootViewModel.latitude.value;
+    final double lng = _rootViewModel.longitude.value;
 
-    _currentLocation = nextLocation;
-    routeCoordinates.add(nextLocation);
-    await _drawPath();
-
-    // 위치 추적 모드일 때만 카메라 업데이트
-    if (isFollowingLocation.value) {
-      await _mapController.updateCamera(
-        NCameraUpdate.fromCameraPosition(NCameraPosition(
-          target: nextLocation,
-          zoom: currentZoom.value,
-        )),
-      );
-    }
+    debugPrint('위도: $lat, 경도: $lng');
   }
 
   Future<void> moveToCurrentLocation() async {
@@ -435,39 +515,6 @@ class PloggingViewModel extends GetxController {
     );
   }
 
-  Future<void> addMarkerAtCurrentLocation() async {
-    if (_currentLocation == null) return;
-
-    try {
-      // 마커 이미지 설정
-      final iconImage = await const NOverlayImage.fromAssetImage(
-          'assets/icons/test_marker.png');
-
-      // 현재 위치에 마커 생성
-      final marker = NMarker(
-        id: 'user_marker_${userMarkers.length}',
-        position: _currentLocation!,
-        icon: iconImage,
-      );
-
-      // 마커 추가
-      await _mapController.addOverlay(marker);
-      userMarkers.add(marker);
-
-      Get.snackbar(
-        '마커 추가',
-        '현재 위치에 마커가 추가되었습니다',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } catch (e) {
-      Get.snackbar(
-        '오류',
-        '마커 추가 실패',
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
-
   //길 그릭
   Future<void> _drawPath() async {
     if (routeCoordinates.isNotEmpty) {
@@ -482,8 +529,8 @@ class PloggingViewModel extends GetxController {
   }
 
   Future<void> _addTrashBinMarkers() async {
-    final iconImage = await const NOverlayImage.fromAssetImage(
-        'assets/icons/test_marker.png');
+    final iconImage =
+        await const NOverlayImage.fromAssetImage('assets/icons/bin_marker.png');
     final List<NLatLng> nearbyTrashBins = _generateNearbyTrashBins();
 
     // Generate markers with tap listeners
@@ -494,25 +541,6 @@ class PloggingViewModel extends GetxController {
               id: 'trash_bin_${entry.key}',
               position: entry.value,
               icon: iconImage,
-              // onTap: (marker) {
-              //   // Show a modal or perform an action
-              //   Get.defaultDialog(
-              //     title: "Trash Bin Details",
-              //     content: Column(
-              //       mainAxisSize: MainAxisSize.min,
-              //       children: [
-              //         Text("Marker ID: ${marker.info.id}"),
-              //         Text(
-              //             "Position: ${marker.position.latitude}, ${marker.position.longitude}"),
-              //         const SizedBox(height: 10),
-              //         ElevatedButton(
-              //           onPressed: () => Get.back(), // Close dialog
-              //           child: const Text("Close"),
-              //         ),
-              //       ],
-              //     ),
-              //   );
-              // },
             ))
         .toList();
 
@@ -597,53 +625,6 @@ class PloggingViewModel extends GetxController {
               ElevatedButton(
                 onPressed: () => Get.back(),
                 child: const Text('닫기'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> showRouteSVG() async {
-    if (routeCoordinates.isEmpty) return;
-
-    // 좌표 정규화
-    final normalizedCoords = _normalizeCoordinates();
-    final pathData = _createSVGPathData(normalizedCoords);
-
-    Get.dialog(
-      Dialog(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('플로깅 경로', style: FontSystem.H3),
-              const SizedBox(height: 16),
-              AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: SvgPicture.string(
-                    '''
-                  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                      d="$pathData"
-                      fill="none"
-                      stroke="green"
-                      stroke-width="2"
-                    />
-                  </svg>
-                  ''',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => Get.back(),
-                child: Text('닫기'),
               ),
             ],
           ),
