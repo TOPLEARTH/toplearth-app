@@ -1,10 +1,9 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:toplearth/core/view/base_widget.dart';
+import 'package:toplearth/presentation/view/widget/custom_model_viewer.dart';
 import 'package:toplearth/presentation/view_model/home/home_view_model.dart';
-import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 
 class HomeMapSwitcherView extends StatelessWidget {
   const HomeMapSwitcherView({super.key});
@@ -95,22 +94,38 @@ class HomeMapSwitcherView extends StatelessWidget {
   }
 }
 
-// UserEarthView
 class UserEarthView extends StatelessWidget {
   const UserEarthView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Get.toNamed('/legacy'); // Navigate to the Earth view
-      },
       child: Container(
-        height: 300,
+        height: 350,
         width: double.infinity,
         alignment: Alignment.center,
-        child: const Text(
-            '지구 뷰 Placeholder'), // Replace with your actual Earth view
+        child: Stack(
+          children: [
+            const CustomModelViewer(
+              animationToPlay: 'Animation.sad',
+              src: 'assets/animations/sad3.glb',
+              backgroundColor: Colors.white,
+              autoRotateDelay: 0,
+            ),
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  // Handle tap events here
+                  Get.toNamed('/legacy'); // Navigate to the Earth view
+                },
+                child: Container(
+                  color: Colors
+                      .transparent, // Make sure the container is transparent to see the model
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

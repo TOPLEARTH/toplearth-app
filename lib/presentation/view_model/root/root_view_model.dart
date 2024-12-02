@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:core';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:toplearth/app/env/dev/dev_environment.dart';
 import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
@@ -19,10 +23,12 @@ import 'package:toplearth/domain/entity/user/user_state.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
 import 'package:toplearth/domain/usecase/matching/matching_status_usecase.dart';
 import 'package:toplearth/domain/usecase/user/read_user_state_usecase.dart';
+
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
+
 
 class RootViewModel extends GetxController {
   /* ------------------------------------------------------ */
@@ -75,7 +81,6 @@ class RootViewModel extends GetxController {
       _matchingRealTimeInfoState.value;
 
   RxBool isBootstrapLoaded = false.obs;
-
   // 전역 상태로 관리할 위치 정보
   RxDouble latitude = 0.0.obs;
   RxDouble longitude = 0.0.obs;
@@ -212,13 +217,13 @@ class RootViewModel extends GetxController {
 
   @override
   void onReady() async {
-    fetchBootstrapInformation();
+
+    await fetchBootstrapInformation();
     super.onReady();
   }
 
-  void fetchBootstrapInformation() async {
-    final StateWrapper<BootstrapState> state =
-        await _readBootStrapUseCase.execute();
+  Future<void> fetchBootstrapInformation() async {
+    StateWrapper<BootstrapState> state = await _readBootStrapUseCase.execute();
 
     if (state.success) {
       // debugPrint('bootstrap: ${state.data!.userInfo}');

@@ -18,10 +18,12 @@ class MyPageViewModel extends GetxController {
   late final RxString _selectedTab;
   late final RxInt _selectedDayIndex;
   // 현재 선택된 날짜
-  late final Rx<DateTime> selectedDate = DateTime.now().obs;
+  late final Rx<DateTime> _selectedDate;
 
   // 현재 포커스된 날짜 (캘린더 이동 시 사용)
-  late final Rx<DateTime> focusedDate = DateTime.now().obs;
+  late final Rx<DateTime> _focusedDate;
+  // 캘린더 확장 상태
+  late final RxBool isCalendarExpanded = true.obs;
 
   /* ------------------------------------------------------ */
   /* ----------------- Public Fields ---------------------- */
@@ -30,6 +32,8 @@ class MyPageViewModel extends GetxController {
   PloggingInfoState get ploggingInfoState => _ploggingInfoState.value;
   String get selectedTab => _selectedTab.value;
   int get selectedDayIndex => _selectedDayIndex.value;
+  DateTime get selectedDate => _selectedDate.value;
+  DateTime get focusedDate => _focusedDate.value;
   @override
   void onInit() {
     super.onInit();
@@ -42,7 +46,9 @@ class MyPageViewModel extends GetxController {
     _ploggingInfoState = PloggingInfoState.initial().obs;
     _selectedTab = 'DAILY 퀘스트'.obs;
     _selectedDayIndex = 2.obs;
-
+    _selectedDate = DateTime.now().obs;
+    _focusedDate = DateTime.now().obs;
+    //
     // RootViewModel의 isBootstrapLoaded 상태 변화를 감지
     ever(_rootViewModel.isBootstrapLoaded, (isLoaded) {
       if (isLoaded) {
@@ -69,7 +75,7 @@ class MyPageViewModel extends GetxController {
 
   // 특정 날짜의 플로깅 데이터 가져오기
   List<PloggingState> getPloggingForSelectedDate() {
-    final dateKey = _formatDate(selectedDate.value);
+    final dateKey = _formatDate(selectedDate);
     return ploggingInfoState.ploggingList[dateKey] ?? [];
   }
 
@@ -81,12 +87,17 @@ class MyPageViewModel extends GetxController {
 
   // 선택된 날짜 업데이트
   void updateSelectedDate(DateTime date) {
-    selectedDate.value = date;
+    _selectedDate.value = date;
   }
 
   // 포커스된 날짜 업데이트
   void updateFocusedDate(DateTime date) {
-    focusedDate.value = date;
+    _focusedDate.value = date;
+  }
+
+// 캘린더 확장/축소 상태 토글
+  void toggleCalendarExpanded() {
+    isCalendarExpanded.value = !isCalendarExpanded.value;
   }
 
   // 이번 달 완료된 플로깅 횟수 가져오기
