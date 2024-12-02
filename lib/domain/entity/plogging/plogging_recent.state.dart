@@ -66,7 +66,6 @@ class PloggingRecentState {
     }).toList();
   }
 
-
   factory PloggingRecentState.fromJson(Map<String, dynamic> json) {
     return PloggingRecentState(
       ploggingId: json['ploggingId'] as int,
@@ -85,5 +84,18 @@ class PloggingRecentState {
         }
       }).toList(),
     );
+  }
+  // toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'ploggingId': ploggingId,
+      'teamName': teamName,
+      'distance': distance,
+      'duration': duration,
+      'trashCnt': trashCnt,
+      'startedAt': startedAt.toIso8601String(),
+      'endedAt': endedAt.toIso8601String(),
+      'ploggingImageList': ploggingImageList.map((e) => e.toJson()).toList(),
+    };
   }
 }

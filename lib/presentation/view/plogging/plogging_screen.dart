@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/presentation/view/plogging/DraggableSheet.dart';
 import 'package:toplearth/presentation/view_model/plogging/naver_map_component.dart';
 import 'package:toplearth/presentation/view_model/plogging/plogging_view_model.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 
 class PloggingScreen extends BaseScreen<PloggingViewModel> {
@@ -21,7 +21,7 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) {
-    return DefaultAppBar(
+    return const DefaultAppBar(
       isOnlyNeedCenterLogo: true,
     );
   }
@@ -34,12 +34,12 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('위치 정보를 불러오는 데 실패했습니다.'));
+          return const Center(child: Text('위치 정보를 불러오는 데 실패했습니다.'));
         } else {
           return Stack(
             children: [
               // Use NaverMapComponent here
-              NaverMapComponent(),
+              const NaverMapComponent(),
               Positioned(
                 right: 16,
                 bottom: 150,

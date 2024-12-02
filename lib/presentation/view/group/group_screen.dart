@@ -74,8 +74,8 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildInfoRow("그룹명 🌏", viewModel.teamInfoState.teamName!),
-                _buildInfoRow("그룹코드 🌿", viewModel.teamInfoState.teamCode!),
+                _buildInfoRow("그룹명 🌏", viewModel.teamInfoState.teamName),
+                _buildInfoRow("그룹코드 🌿", viewModel.teamInfoState.teamCode),
               ],
             ),
           ),
@@ -99,7 +99,7 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
   Widget _buildMemberList() {
     // Get the team members from the ViewModel
 
-    if (viewModel.teamInfoState.teamMembers!.isEmpty) {
+    if (viewModel.teamInfoState.teamMembers.isEmpty) {
       return const SizedBox
           .shrink(); // Return an empty widget if no members exist
     }
@@ -120,7 +120,7 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
                 const Text('팀원', style: FontSystem.H2),
                 const SizedBox(height: 12),
                 // Render each member row
-                ...viewModel.teamInfoState.teamMembers!
+                ...viewModel.teamInfoState.teamMembers
                     .map((member) => _buildMemberRow(member))
                     .toList(),
               ],
@@ -149,11 +149,11 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
   }
 
   Widget _buildCircularProgressBar() {
-    double winRate = viewModel.teamInfoState.matchCnt! > 0
-        ? (viewModel.teamInfoState.winCnt! / viewModel.teamInfoState.matchCnt!)
+    double winRate = viewModel.teamInfoState.matchCnt > 0
+        ? (viewModel.teamInfoState.winCnt / viewModel.teamInfoState.matchCnt)
         : 0.0;
-    double winRate100 = viewModel.teamInfoState.matchCnt! > 0
-        ? (viewModel.teamInfoState.winCnt! / viewModel.teamInfoState.matchCnt!) *
+    double winRate100 = viewModel.teamInfoState.matchCnt > 0
+        ? (viewModel.teamInfoState.winCnt / viewModel.teamInfoState.matchCnt) *
             100
         : 0.0;
     return Card(

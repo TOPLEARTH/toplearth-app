@@ -3,17 +3,17 @@ import 'package:get/get.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
-import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
 import 'package:toplearth/presentation/view/matching/real_time_team_activity_section.dart';
-import 'package:toplearth/presentation/view/matching/recent_plogging_view.dart';
+import 'package:toplearth/presentation/view/matching/widget/matching_group_recent_plogging_widget.dart';
 import 'package:toplearth/presentation/view/root/build_plogging_view.dart';
 import 'package:toplearth/presentation/view/root/matched_view.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
-import 'package:toplearth/presentation/view_model/plogging/naver_map_component.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 import 'package:toplearth/presentation/widget/dialog/group_request_dialog.dart';
+
+import 'widget/plogging_preview_widget.dart';
 
 class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
   const MatchingScreen({super.key});
@@ -147,6 +147,8 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
         ),
         const SizedBox(height: 16),
         RealTimeTeamActivitySection(),
+        const PreviewPloggingMap(),
+        const RecentPloggingPreview(),
       ],
     );
   }

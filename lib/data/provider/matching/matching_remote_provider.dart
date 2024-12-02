@@ -22,10 +22,6 @@ abstract class MatchingRemoteProvider {
   // /api/v1/matching/status
   Future<ResponseWrapper> getMatchingStatus();
 
-  // 최근 플로깅 조회
-  // /api/v1/matching/plogging
-
-
   // 대결 종료
   // /api/v1/matching/${matchingId}/end
   Future<ResponseWrapper> endVsMatching({
@@ -33,10 +29,9 @@ abstract class MatchingRemoteProvider {
     required int competitionScore,
     required int totalPickUpCnt,
     required bool winFlag,
-});
+  });
 
   // 최근 플로깅 조회
   // /api/v1/matching/plogging
   Future<ResponseWrapper> getRecentPlogging();
-
 }

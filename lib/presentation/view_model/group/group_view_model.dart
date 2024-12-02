@@ -40,7 +40,7 @@ class GroupViewModel extends GetxController {
     ever(_rootViewModel.isBootstrapLoaded, (isLoaded) {
       if (isLoaded) {
         // Bootstrap 데이터가 로드된 이후 업데이트
-        // _teamInfoState.value = _rootViewModel.teamInfoState.value;
+        _teamInfoState.value = _rootViewModel.teamInfoState.value;
         debugPrint('debug in groupViewModel: ${teamInfoState.teamName}');
         debugPrint('debug in groupViewModel: ${teamInfoState.teamCode}');
       }
