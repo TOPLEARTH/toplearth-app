@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:toplearth/core/wrapper/response_wrapper.dart';
 
 abstract class PloggingRemoteProvider {
-
   // 플로깅중 이미지 업로드
   // /api/v1/plogging/{ploggingId}/image
   Future<ResponseWrapper> uploadPloggingImage({
@@ -36,5 +35,11 @@ abstract class PloggingRemoteProvider {
     required File ploggingImage, // 플로깅 이미지
     required List<int> ploggingImageIds,
     required List<String> labels,
+  });
+
+  // 플로깅 신고
+  // /api/v1/plogging/{ploggingId}/reports
+  Future<ResponseWrapper> reportPlogging({
+    required int ploggingId, // 플로깅 ID
   });
 }
