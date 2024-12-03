@@ -141,29 +141,29 @@ class DraggableSheet extends BaseWidget<PloggingViewModel> {
           },
         ),
         const SizedBox(height: 16),
-        _buildButton(
-          label: '사진 업로드',
-          icon: Icons.upload_file,
-          onTap: () async {
-            final picker = ImagePicker();
-            final XFile? file =
-                await picker.pickImage(source: ImageSource.gallery);
-            if (file != null) {
-              viewModel.setSelectedImage(File(file.path));
-              final position = await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high,
-              );
-              await viewModel.addMarkerAtCurrentLocationWithCoordinates(
-                position.latitude,
-                position.longitude,
-              );
-              await viewModel.uploadImage(
-                position.latitude,
-                position.longitude,
-              );
-            }
-          },
-        ),
+        // _buildButton(
+        //   label: '사진 업로드',
+        //   icon: Icons.upload_file,
+        //   onTap: () async {
+        //     final picker = ImagePicker();
+        //     final XFile? file =
+        //         await picker.pickImage(source: ImageSource.gallery);
+        //     if (file != null) {
+        //       viewModel.setSelectedImage(File(file.path));
+        //       final position = await Geolocator.getCurrentPosition(
+        //         desiredAccuracy: LocationAccuracy.high,
+        //       );
+        //       await viewModel.addMarkerAtCurrentLocationWithCoordinates(
+        //         position.latitude,
+        //         position.longitude,
+        //       );
+        //       await viewModel.uploadImage(
+        //         position.latitude,
+        //         position.longitude,
+        //       );
+        //     }
+        //   },
+        // ),
       ],
     );
   }

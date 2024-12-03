@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
+import 'package:toplearth/domain/entity/global/region_ranking_state.dart';
 import 'package:toplearth/presentation/view/widget/custom_model_viewer.dart';
 import 'package:toplearth/presentation/view_model/home/home_view_model.dart';
 
@@ -135,52 +137,35 @@ class UserMapView extends BaseWidget<HomeViewModel> {
   const UserMapView({super.key});
 
   @override
-  buildView(BuildContext context) {
-    // 기본 색상 매핑 (1-25)
-    const Map<String, Color> colorMap = {
-      '1': Color(0xFFEBF3FA),
-      '2': Color(0xFFD9E8F6),
-      '3': Color(0xFFAFCCEC),
-      '4': Color(0xFF8AB0D9),
-      '5': Color(0xFF6A94C4),
-      '6': Color(0xFF4F7AAE),
-      '7': Color(0xFF3A6495),
-      '8': Color(0xFF2A4F7A),
-      '9': Color(0xFF1A3A5F),
-      '10': Color(0xFF0F2644),
-      '11': Color(0xFF0A1A2E),
-      '12': Color(0xFF050D17),
-      '13': Color(0xFFEBF3FA),
-      '14': Color(0xFFD9E8F6),
-      '15': Color(0xFFAFCCEC),
-      '16': Color(0xFF8AB0D9),
-      '17': Color(0xFF6A94C4),
-      '18': Color(0xFF4F7AAE),
-      '19': Color(0xFF3A6495),
-      '20': Color(0xFF2A4F7A),
-      '21': Color(0xFF1A3A5F),
-      '22': Color(0xFF0F2644),
-      '23': Color(0xFF0A1A2E),
-      '24': Color(0xFF050D17),
-      '25': Color(0xFFEBF3FA),
-    };
-
+  Widget buildView(BuildContext context) {
     return Obx(() {
-      // viewModel.regionId를 기준으로 붉은색으로 업데이트
-      final regionId = controller.regionId.value.toString();
-      final updatedColorMap = Map<String, Color>.from(colorMap)
-        ..[regionId] = const Color(0xFFFF0000); // 특정 지역을 붉은색으로 설정
+      final regionRankingInfo =
+          controller.regionRankingInfoState.regionRankingInfo;
+
+      if (regionRankingInfo.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      // 컬러 매핑 생성 (랭킹 순서에 따라 색상 설정)
+      final Map<String, Color> colorMap = _generateColorMap(regionRankingInfo);
 
       return FutureBuilder<String>(
         future: _loadAndModifySvg(
-            'assets/images/seoul/seoul.svg', updatedColorMap, context),
+          'assets/images/seoul/seoul.svg',
+          colorMap,
+          context,
+          regionRankingInfo,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
-            return SvgPicture.string(
-              snapshot.data!,
-              height: 300,
-              width: double.infinity,
+            return GestureDetector(
+              onTapDown: (details) => _handleMapTap(details, regionRankingInfo),
+              child: SvgPicture.string(
+                snapshot.data!,
+                height: 400,
+                width: double.infinity,
+              ),
             );
           } else if (snapshot.hasError) {
             return const Center(child: Text('Error loading SVG'));
@@ -191,8 +176,12 @@ class UserMapView extends BaseWidget<HomeViewModel> {
     });
   }
 
-  Future<String> _loadAndModifySvg(String assetPath,
-      Map<String, Color> colorMap, BuildContext context) async {
+  Future<String> _loadAndModifySvg(
+    String assetPath,
+    Map<String, Color> colorMap,
+    BuildContext context,
+    List<RegionRankingState> regionRankingInfo,
+  ) async {
     // SVG 파일 문자열 읽기
     final svgString =
         await DefaultAssetBundle.of(context).loadString(assetPath);
@@ -212,5 +201,72 @@ class UserMapView extends BaseWidget<HomeViewModel> {
     });
 
     return modifiedSvg;
+  }
+
+  void _handleMapTap(
+      TapDownDetails details, List<RegionRankingState> regionRankingInfo) {
+    // 클릭된 SVG ID에 해당하는 RegionId 탐색 (상세 구현 필요)
+    final String tappedRegionId = _findRegionId(details);
+
+    // RegionId에 매칭되는 데이터 가져오기
+    final tappedRegion = regionRankingInfo
+        .firstWhere((region) => region.regionId.toString() == tappedRegionId);
+
+    // 모달 표시
+    Get.dialog(
+      AlertDialog(
+        title: Text('${tappedRegion.regionName} 정보'),
+        content: Text(
+            '${tappedRegion.regionName}는 ${tappedRegion.score}점으로 ${tappedRegion.ranking}등이에요!'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, Color> _generateColorMap(
+      List<RegionRankingState> regionRankingInfo) {
+    // Primary Color에서 랭킹에 따른 색상 선택
+    final List<Color> gradientColors = [
+      ColorSystem.primary[900]!, // 1등
+      ColorSystem.primary[700]!, // 2등
+      ColorSystem.primary[700]!, // 2등
+      ColorSystem.primary[500]!, // 3등
+      ColorSystem.primary[500]!, // 3등
+      ColorSystem.primary[500]!, // 3등
+      ColorSystem.primary[400]!, // 4등
+      ColorSystem.primary[400]!, // 4등
+      ColorSystem.primary[400]!, // 4등
+      ColorSystem.primary[400]!, // 4등
+      ColorSystem.primary[300]!, // 5등
+      ColorSystem.primary[300]!, // 5등
+      ColorSystem.primary[300]!, // 5등
+      ColorSystem.primary[300]!, // 5등
+      ColorSystem.primary[300]!, // 5등
+      ColorSystem.primary[200]!, // 6등
+      ColorSystem.primary[200]!, // 6등
+      ColorSystem.primary[200]!, // 6등
+      ColorSystem.primary[200]!, // 6등
+      ColorSystem.primary[200]!, // 6등
+      ColorSystem.primary[200]!, // 6등
+    ];
+
+    final Map<String, Color> colorMap = {};
+    for (final region in regionRankingInfo) {
+      final colorIndex = region.ranking - 1; // 랭킹 기반 색상 선택
+      colorMap[region.regionId.toString()] =
+          gradientColors[colorIndex < gradientColors.length ? colorIndex : 12];
+    }
+    return colorMap;
+  }
+
+  String _findRegionId(TapDownDetails details) {
+    // SVG 좌표 기반으로 클릭된 RegionId 탐지 로직 구현 필요
+    // 임시로 RegionId 1 반환
+    return '1';
   }
 }

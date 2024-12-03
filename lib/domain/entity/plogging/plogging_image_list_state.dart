@@ -1,7 +1,8 @@
 import 'package:toplearth/domain/entity/plogging/plogging_image_state.dart';
+import 'package:toplearth/domain/entity/plogging/plogging_no_label_state.dart';
 
 class PloggingImageListState {
-  final List<PloggingImageState> ploggingImages;
+  final List<PloggingNoLabelState> ploggingImages;
 
   PloggingImageListState({
     required this.ploggingImages,
@@ -14,7 +15,7 @@ class PloggingImageListState {
   }
 
   PloggingImageListState copyWith({
-    List<PloggingImageState>? ploggingImages,
+    List<PloggingNoLabelState>? ploggingImages,
   }) {
     return PloggingImageListState(
       ploggingImages: ploggingImages ?? this.ploggingImages,
@@ -24,7 +25,7 @@ class PloggingImageListState {
   factory PloggingImageListState.fromJson(Map<String, dynamic> json) {
     return PloggingImageListState(
       ploggingImages: (json['ploggingImages'] as List<dynamic>?)
-          ?.map((image) => PloggingImageState.fromJson(image))
+          ?.map((image) => PloggingNoLabelState.fromJson(image))
           .toList() ??
           [],
     );
@@ -32,6 +33,6 @@ class PloggingImageListState {
 
   @override
   String toString() {
-    return 'PloggingImageListState(ploggingImages: $ploggingImages)';
+    return 'PloggingImageListState{ploggingImages: $ploggingImages}';
   }
 }

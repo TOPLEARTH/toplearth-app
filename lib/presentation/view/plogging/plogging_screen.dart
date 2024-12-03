@@ -69,15 +69,15 @@ class PloggingScreen extends BaseScreen<PloggingViewModel> {
             viewModel.showTrashBins.value ? Icons.delete : Icons.delete_outline,
           ),
         ),
-        const SizedBox(height: 10),
-        FloatingActionButton(
-          heroTag: 'toggle_photo_markers',
-          onPressed: () async {
-            await viewModel.togglePhotoMarkers();
-          },
-          backgroundColor: Colors.orange,
-          child: const Icon(Icons.visibility, color: Colors.white),
-        ),
+        // const SizedBox(height: 10),
+        // FloatingActionButton(
+        //   heroTag: 'toggle_photo_markers',
+        //   onPressed: () async {
+        //     await viewModel.togglePhotoMarkers();
+        //   },
+        //   backgroundColor: Colors.orange,
+        //   child: const Icon(Icons.visibility, color: Colors.white),
+        // ),
       ],
     );
   }

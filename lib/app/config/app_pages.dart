@@ -10,7 +10,10 @@ import 'package:toplearth/presentation/view/matching/matching_group_search_scree
 import 'package:toplearth/presentation/view/matching/matching_group_select_screen.dart';
 import 'package:toplearth/presentation/view/on_boarding/on_boarding_screen.dart';
 import 'package:toplearth/presentation/view/plogging/plogging_labeling_screen.dart';
+import 'package:toplearth/presentation/view/plogging/plogging_screen.dart';
 import 'package:toplearth/presentation/view/plogging/plogging_share_screen.dart';
+import 'package:toplearth/presentation/view/plogging/recent_plogging_screen.dart';
+import 'package:toplearth/presentation/view/report/report_screen.dart';
 import 'package:toplearth/presentation/view/store/store_detail_screen.dart';
 import 'package:toplearth/presentation/view/store/store_screen.dart';
 // import 'package:toplearth/presentation/view/root/test_code_screen.dart';
@@ -81,6 +84,11 @@ abstract class AppPages {
       binding: MatchingGroupCreateCompleteBinding(),
     ),
     GetPage(
+      name: AppRoutes.PLOGGING,
+      page: () => PloggingScreen(),
+      binding: PloggingBinding(),
+    ),
+    GetPage(
       name: AppRoutes.PLOGGING_LABELING,
       page: () => PloggingLabelingScreen(),
       binding: PloggingBinding(),
@@ -93,6 +101,15 @@ abstract class AppPages {
     GetPage(
       name: AppRoutes.PLOGGING_SHARE,
       page: () => PloggingShareScreen(),
+      binding: PloggingBinding(),
+    ),
+    GetPage(
+        name: AppRoutes.PLOGGING_RECENT,
+        page: () => RecentPloggingScreen(),
+        binding: PloggingBinding()),
+    GetPage(
+      name: AppRoutes.REPORT,
+      page: () => ReportScreen(),
       binding: PloggingBinding(),
     ),
   ];

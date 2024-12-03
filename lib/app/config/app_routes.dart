@@ -8,12 +8,16 @@ abstract class AppRoutes {
 
   static const String LEGACY = '/legacy';
 
+  static const String REPORT = '/report';
+
   // 플로깅 시작전, 진행중, 끝난후 인증, 끝난후 라벨링
+  static const String PLOGGING = '/plogging';
   static const String PLOGGING_PREPARE = '/plogging-prepare';      // 시작 전 화면
   static const String PLOGGING_PROGRESS = '/plogging-progress';    // 진행 중 화면
   static const String PLOGGING_VERIFY = '/plogging-verify';        // 끝난 후 인증 화면
   static const String PLOGGING_LABELING = '/plogging-labeling';
   static const String PLOGGING_SHARE = '/plogging-share';
+  static const String PLOGGING_RECENT = '/plogging-recent';
 
   // 스토어 상세
   static const String STORE_DETAIL = '/store-detail';

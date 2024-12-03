@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/app_routes.dart';
+import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/presentation/view_model/plogging/plogging_view_model.dart';
+import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 
 class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
   final List<Map<String, dynamic>> ploggingImages;
@@ -120,9 +124,12 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
                 },
               ),
             ),
-            ElevatedButton(
+            RoundedRectangleTextButton(
+              width: double.infinity,
+              height: 58,
+              backgroundColor: ColorSystem.main,
               onPressed: _submitLabels,
-              child: const Text('라벨링 완료'),
+              text: '라벨링 완료',
             ),
           ],
         ),
@@ -148,7 +155,7 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
               ),
               const SizedBox(height: 16),
               const Text(
-                '쓰레기 카테고리를 선택해주세요',
+                '어떤 쓰레기를 주었는지 알려줄래요?',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
@@ -221,31 +228,27 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
   }
 
   void _submitLabels() {
-    Get.toNamed(AppRoutes.PLOGGING_SHARE);
+    // Ensure all images are labeled
     if (selectedLabels.length != ploggingImages.length) {
       Get.snackbar('오류', '모든 이미지에 대해 라벨을 선택해주세요.');
       return;
     }
 
-    print('Selected Labels: $selectedLabels');
-
+    // Extract imageIds and labels
     final imageIds = selectedLabels.keys.toList();
     final labels = selectedLabels.values.toList();
 
+    print('Selected Labels: $selectedLabels');
     print('ImageIds: $imageIds');
-
     print('Labels: $labels');
 
-    Get.toNamed(AppRoutes.PLOGGING_SHARE);
-
-    // viewModel.labelingPloggingImages(imageIds, labels
-    //  , s
-    // ).then((result) {
-    //   if (result.success) {
-    //     Get.toNamed(AppRoutes.PLOGGING_SHARE);
-    //   } else {
-    //     Get.snackbar('오류', result.message ?? '라벨링 처리 중 문제가 발생했습니다.');
-    //   }
-    // });
+    // Navigate to PLOGGING_SHARE and pass data
+    Get.toNamed(
+      AppRoutes.PLOGGING_SHARE,
+      arguments: {
+        'imageIds': imageIds,
+        'labels': labels,
+      },
+    );
   }
 }

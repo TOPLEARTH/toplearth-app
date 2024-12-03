@@ -1,7 +1,7 @@
 import 'package:toplearth/domain/type/e_labeling_status.dart';
 
 class PloggingImageState {
-  final String ploggingImageId;
+  final int ploggingImageId;
   final String imageUrl;
   final DateTime createdAt; // Fixed type to DateTime
   final double latitude;
@@ -19,7 +19,7 @@ class PloggingImageState {
   });
 
   PloggingImageState copyWith({
-    String? ploggingImageId, // Correct type
+    int? ploggingImageId, // Correct type
     String? imageUrl,
     DateTime? createdAt,
     double? latitude,
@@ -40,7 +40,7 @@ class PloggingImageState {
 
   factory PloggingImageState.initial() {
     return PloggingImageState(
-      ploggingImageId: "0", // Correct type, default to "0
+      ploggingImageId: 0, // Correct type, default to "0
       imageUrl: '',
       createdAt: DateTime.now(), // Correct type
       latitude: 0.0,
@@ -52,7 +52,7 @@ class PloggingImageState {
 
   factory PloggingImageState.fromJson(Map<String, dynamic> json) {
     return PloggingImageState(
-      ploggingImageId: json['ploggingImageId'] as String,
+      ploggingImageId: json['ploggingImageId'] as int,
       imageUrl: json['imageUrl'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String), // Parse DateTime
       latitude: (json['latitude'] as num).toDouble(), // Ensure double conversion

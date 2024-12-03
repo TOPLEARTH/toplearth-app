@@ -208,29 +208,47 @@ class PloggingViewModel extends GetxController {
   }
 
   Future<ResultWrapper> labelingPloggingImages(
-      List<int> imageIds, List<String> labels, File screenshotFile) async {
-    if (imageIds.length != labels.length) {
+    List<int> imageIds,
+    List<String> labels,
+    File screenshotFile,
+  ) async {
+    // 이미지 ID와 라벨 리스트 유효성 검사
+    if (imageIds.isEmpty ||
+        labels.isEmpty ||
+        imageIds.length != labels.length) {
       return ResultWrapper(
-          success: false, message: '이미지 ID와 라벨 리스트 크기가 일치하지 않습니다.');
+        success: false,
+        message: '이미지 ID와 라벨 리스트가 유효하지 않거나 크기가 일치하지 않습니다.',
+      );
     }
 
     try {
+      // 라벨링 및 스크린샷 파일 처리
       StateWrapper<void> state = await _labelingPloggingUseCase.execute(
         PloggingLabelingCondition(
           ploggingId: ploggingId,
-          ploggingImage: screenshotFile, // Use the screenshot file here
           ploggingImageIds: imageIds,
           labels: labels,
+          ploggingImage: screenshotFile,
         ),
       );
 
       if (!state.success) {
-        return ResultWrapper(success: false, message: state.message);
+        return ResultWrapper(
+          success: false,
+          message: state.message,
+        );
       }
 
-      return ResultWrapper(success: true, message: '라벨링 완료');
+      return ResultWrapper(
+        success: true,
+        message: '라벨링 및 스크린샷 저장이 성공적으로 처리되었습니다.',
+      );
     } catch (e) {
-      return ResultWrapper(success: false, message: '라벨링 처리 중 오류: $e');
+      return ResultWrapper(
+        success: false,
+        message: '처리 중 오류 발생: $e',
+      );
     }
   }
 
@@ -242,7 +260,7 @@ class PloggingViewModel extends GetxController {
         longitude,
       );
 
-      Get.snackbar('성공', '마커 추가 완료');
+      // Get.snackbar('성공', '마커 추가 완료');
     } catch (e) {
       rethrow; // 에러를 상위로 전달
     }
@@ -324,6 +342,7 @@ class PloggingViewModel extends GetxController {
     isLocationEnabled.value = true;
   }
 
+
   final MapHelper mapHelper = MapHelper();
 
   void onMapReady(NaverMapController controller) {
@@ -374,17 +393,38 @@ class PloggingViewModel extends GetxController {
       distanceFilter: 5, // 5미터마다 업데이트
     );
 
+    Position? lastPosition; // 마지막 기록된 위치
+
     _positionStreamSubscription =
         Geolocator.getPositionStream(locationSettings: locationSettings)
             .listen((Position position) {
-      _currentLocation = NLatLng(position.latitude, position.longitude);
-      routeCoordinates.add(_currentLocation!);
+      // 마지막 위치가 존재할 경우 두 위치 간 거리를 계산
+      if (lastPosition != null) {
+        double distanceMoved = Geolocator.distanceBetween(
+          lastPosition!.latitude,
+          lastPosition!.longitude,
+          position.latitude,
+          position.longitude,
+        );
 
-      if (isFollowingLocation.value) {
-        _updateCamera();
+        // 이동 거리가 10미터 이상인 경우에만 경로 추가
+        if (distanceMoved >= 10) {
+          _currentLocation = NLatLng(position.latitude, position.longitude);
+          routeCoordinates.add(_currentLocation!);
+          lastPosition = position; // 현재 위치를 마지막 위치로 업데이트
+
+          if (isFollowingLocation.value) {
+            _updateCamera();
+          }
+
+          _drawPath(); // 경로를 다시 그리기
+        }
+      } else {
+        // 첫 번째 위치 기록
+        lastPosition = position;
+        _currentLocation = NLatLng(position.latitude, position.longitude);
+        routeCoordinates.add(_currentLocation!);
       }
-
-      _drawPath();
     });
 
     _startTimer();
