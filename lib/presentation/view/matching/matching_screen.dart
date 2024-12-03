@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timezone/timezone.dart' as tz;
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
+import 'package:toplearth/app/utility/hour_util.dart';
 import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
+import 'package:toplearth/presentation/view/matching/matching_widget/matched_view.dart';
 import 'package:toplearth/presentation/view/matching/real_time_team_activity_section.dart';
 import 'package:toplearth/presentation/view/matching/widget/matching_group_recent_plogging_widget.dart';
 import 'package:toplearth/presentation/view/root/build_plogging_view.dart';
-import 'package:toplearth/presentation/view/matching/matching_widget/matched_view.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 import 'package:toplearth/presentation/widget/dialog/group_request_dialog.dart';
+
 import 'widget/plogging_preview_widget.dart';
-import 'package:intl/intl.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
   const MatchingScreen({super.key});
@@ -189,6 +189,8 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
   }
 }
 
+final int nextHour = getNextHour();
+
 /// WAITING View
 class _buildWaitingView extends BaseWidget<MatchingGroupViewModel> {
   @override
@@ -197,7 +199,7 @@ class _buildWaitingView extends BaseWidget<MatchingGroupViewModel> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          '${viewModel.teamInfoState.value.teamName}은 현재\n7시 플로깅 매칭중이에요!',
+          '${viewModel.teamInfoState.value.teamName}은 현재\n $nextHour시 플로깅 매칭중이에요!',
           style: FontSystem.H1.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),

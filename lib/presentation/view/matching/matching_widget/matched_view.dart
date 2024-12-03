@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/font_system.dart';
+import 'package:toplearth/app/utility/hour_util.dart';
 import 'package:toplearth/presentation/view/root/SharedProgressBar.dart';
 import 'package:toplearth/presentation/view/root/matching_view_controller.dart';
 import 'package:toplearth/presentation/widget/team_member_activity_card.dart';
 
 class MatchedView extends StatelessWidget {
   final MatchedViewController controller = Get.put(MatchedViewController());
-
+  final nextHour = getNextHour();
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '얼쑤얼쑤 1 팀과 7시에\n플로깅 대전이 매칭되었어요!',
+          '얼쑤얼쑤 팀과 $nextHour 시에\n플로깅 대전이 매칭되었어요!',
           style: FontSystem.H1.copyWith(color: Colors.black),
         ),
         // Match Info
@@ -49,12 +50,12 @@ class MatchedView extends StatelessWidget {
         const SizedBox(height: 16),
         // Countdown Timer
         Obx(() => Center(
-          child: Text(
+              child: Text(
                 controller.formatTime(controller.countdownTime.value),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
-        )),
+            )),
         const SizedBox(height: 16),
         // Shared Progress Bar
         Obx(() => SharedProgressBar(

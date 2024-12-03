@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
+import 'package:toplearth/app/utility/hour_util.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/presentation/view/matching/real_time_team_activity_section.dart';
 import 'package:toplearth/presentation/view/matching/widget/matching_group_recent_plogging_widget.dart';
@@ -11,6 +12,7 @@ import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_te
 
 /// DEFAULT View
 class BuildDefaultView extends BaseWidget<MatchingGroupViewModel> {
+  final nextHour = getNextHour();
   @override
   Widget buildView(BuildContext context) {
     return Column(
@@ -27,7 +29,7 @@ class BuildDefaultView extends BaseWidget<MatchingGroupViewModel> {
             viewModel.requestRandomMatching();
             Get.snackbar('랜덤 매칭', '랜덤 매칭 요청이 실행되었습니다.');
           },
-          text: '7시 플로깅 랜덤매칭 하기',
+          text: '$nextHour 시 플로깅 랜덤매칭 하기',
           icon: Image.asset(
             'assets/images/matching_dice_image.png',
             width: 36,
@@ -41,7 +43,7 @@ class BuildDefaultView extends BaseWidget<MatchingGroupViewModel> {
         ),
         const SizedBox(height: 16),
         RoundedRectangleTextButton(
-          text: '7시 플로깅 지정매칭 하기',
+          text: '$nextHour 시 플로깅 지정매칭 하기',
           icon: Image.asset(
             'assets/images/matching_target_image.png',
             width: 36,
