@@ -7,6 +7,7 @@ import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/domain/entity/group/member_state.dart';
 import 'package:toplearth/presentation/view_model/group/group_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
+import 'package:toplearth/presentation/widget/image/svg_image_view.dart';
 
 // 뷰모델 익히기용
 class GroupScreen extends BaseScreen<GroupViewModel> {
@@ -136,13 +137,17 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Text(
-            member.name,
-            style: FontSystem.H4,
+          Expanded(
+            child: Text(
+              member.name,
+              style: FontSystem.H4,
+              maxLines: 1, // 한 줄만 표시
+              overflow: TextOverflow.ellipsis, // 초과 부분은 ...로 표시
+            ),
           ),
           const SizedBox(width: 8),
           if (member.role == 'LEADER')
-            const Icon(Icons.manage_accounts, size: 28, color: ColorSystem.main)
+            const SvgImageView(assetPath: 'assets/icons/leader_icon.svg'),
         ],
       ),
     );
@@ -180,7 +185,7 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
             const SizedBox(height: 47),
             Text(
               "${viewModel.teamInfoState.matchCnt}개의 대결 중\n${viewModel.teamInfoState.winCnt}경기를 이겼어요!",
-              style: FontSystem.Sub2.copyWith(color: ColorSystem.grey),
+              style: FontSystem.Sub1.copyWith(color: ColorSystem.main),
             ),
           ],
         ),

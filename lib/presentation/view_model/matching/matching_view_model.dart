@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:toplearth/app/utility/log_util.dart';
 import 'package:toplearth/core/provider/base_socket.dart';
@@ -30,12 +32,14 @@ class MatchingGroupViewModel extends GetxController {
   late final MatchingVsFinishUseCase _matchingVsFinishUseCase;
   late final MatchingRecentPloggingUseCase _matchingRecentPloggingUseCase;
   late final RootViewModel _rootViewModel;
+  Rx<Duration> countdownTime = Duration(minutes: 10).obs;
 
   /* ------------------------------------------------------ */
   /* Managed State ---------------------------------------- */
   /* ------------------------------------------------------ */
   late final RxInt teamId = 0.obs; // 관리되는 팀 ID
   late final RxInt opponentTeamId = 0.obs; // 관리되는 상대 팀 ID
+  late final RxString opponentTeamName = "".obs; // 관리되는 상대 팀 이름
   late final Rx<EMatchingStatus> matchingStatus = EMatchingStatus.DEFAULT.obs;
   late final Rx<RecentMatchingInfoState> recentPloggingList =
       RecentMatchingInfoState(recentMatchingInfo: []).obs;
@@ -44,6 +48,23 @@ class MatchingGroupViewModel extends GetxController {
   /* ------------------------------------------------------ */
   /* Lifecycle Methods ------------------------------------ */
   /* ------------------------------------------------------ */
+
+  String formatTime(Duration duration) {
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
+  }
+
+  void startCountdown() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (countdownTime.value > const Duration(seconds: 0)) {
+        countdownTime.value -= const Duration(seconds: 1);
+      } else {
+        timer.cancel(); // Stop the timer when the countdown reaches 0
+      }
+    });
+  }
+
   @override
   Future<void> onInit() async {
     super.onInit();
@@ -254,6 +275,10 @@ class MatchingGroupViewModel extends GetxController {
   /// 상대 팀 ID 설정
   void setOpponentTeamId(int id) {
     opponentTeamId.value = id;
+  }
+
+  void setOpponentTeamName(String name) {
+    opponentTeamName.value = name;
   }
 
   /// 매칭 상태 변경 시뮬레이션

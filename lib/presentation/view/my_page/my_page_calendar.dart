@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_state.dart';
 import 'package:toplearth/presentation/view_model/my_page/my_page_view_model.dart';
+import 'package:toplearth/presentation/widget/image/network_image_view.dart';
 
 class CalendarWidget extends BaseWidget<MyPageViewModel> {
   const CalendarWidget({super.key});
@@ -100,14 +101,15 @@ class CalendarWidget extends BaseWidget<MyPageViewModel> {
 
     return Stack(
       children: [
-        // 배경 이미지
+        // 배경 이미지 (NetworkImageView 사용)
         ClipRRect(
           borderRadius: BorderRadius.circular(12.0),
-          child: Image.network(
-            imageUrl,
+          child: NetworkImageView(
+            imageUrl: imageUrl,
             width: 120,
             height: 160,
-            fit: BoxFit.cover,
+            borderRadius: BorderRadius.circular(12.0),
+            backgroundColor: Colors.grey.shade200, // 기본 배경색
           ),
         ),
         // 거리와 시간 정보 오버레이

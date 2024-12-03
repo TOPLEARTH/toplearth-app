@@ -84,6 +84,8 @@ class MatchingRemoteProviderImpl extends BaseConnect
       headers: BaseConnect.usedAuthorization,
     );
 
+    LogUtil.printJsonDataType(response.body);
+
     LogUtil.info("getRecentPlogging: ${response.body}");
 
     return ResponseWrapper.fromJson(response.body);

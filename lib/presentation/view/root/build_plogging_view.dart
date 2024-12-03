@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 
 class PloggingViewController extends GetxController {
   RxDouble teamAProgress = 0.5.obs;
@@ -29,6 +30,7 @@ class PloggingViewController extends GetxController {
 
 class WidgetBuildPloggingView extends StatelessWidget {
   final PloggingViewController controller = Get.put(PloggingViewController());
+  final MatchingGroupViewModel viewModel = Get.put(MatchingGroupViewModel());
 
   @override
   Widget build(BuildContext context) {
@@ -68,16 +70,31 @@ class WidgetBuildPloggingView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                '얼쑤얼쑤 🌱 VS 디지유 🌿',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                '${viewModel.teamInfoState.value.teamName} VS ${viewModel.opponentTeamName}',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ],
           ),
         ),
         const SizedBox(height: 16),
+        // Countdown Timer
+        Obx(
+          () => Center(
+            child: Text(
+              viewModel.formatTime(viewModel.countdownTime.value),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
         // Animated Progress Bar
         Obx(
-              () => Column(
+          () => Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

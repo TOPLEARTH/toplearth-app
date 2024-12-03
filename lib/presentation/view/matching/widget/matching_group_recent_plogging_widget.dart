@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
@@ -15,6 +16,7 @@ class RecentPloggingPreview extends BaseWidget<MatchingGroupViewModel> {
   Widget buildView(BuildContext context) {
     return Obx(
       () => Container(
+        margin: const EdgeInsets.only(bottom: 76),
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,27 +24,21 @@ class RecentPloggingPreview extends BaseWidget<MatchingGroupViewModel> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                const Text(
                   '최근 플로깅 인증',
-                  style: FontSystem.H1.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.PLOGGING_RECENT);
+                  },
                   child: Row(
-                    children: [
-                      Text(
-                        '더보기',
-                        style: FontSystem.H3.copyWith(
-                          color: ColorSystem.greySub,
-                        ),
-                      ),
-                      const Icon(
+                    children: const [
+                      Text('더보기', style: FontSystem.Sub2),
+                      Icon(
+                        color: ColorSystem.black,
                         Icons.arrow_forward_ios,
-                        size: 12,
-                        color: ColorSystem.greySub,
+                        size: 14,
                       ),
                     ],
                   ),

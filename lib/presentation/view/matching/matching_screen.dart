@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
+import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
 import 'package:toplearth/presentation/view/matching/real_time_team_activity_section.dart';
 import 'package:toplearth/presentation/view/matching/widget/matching_group_recent_plogging_widget.dart';
 import 'package:toplearth/presentation/view/root/build_plogging_view.dart';
-import 'package:toplearth/presentation/view/root/matched_view.dart';
+import 'package:toplearth/presentation/view/matching/matching_widget/matched_view.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 import 'package:toplearth/presentation/widget/dialog/group_request_dialog.dart';
-
 import 'widget/plogging_preview_widget.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
   const MatchingScreen({super.key});
@@ -25,26 +29,38 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
 
   @override
   Widget buildBody(BuildContext context) {
-    return Obx(() {
-      final currentStatus = viewModel.matchingStatus.value;
+    return Scaffold(
+      resizeToAvoidBottomInset: true, // 키보드가 올라오면 화면 조정
+      body: SingleChildScrollView(
+        child: Obx(() {
+          final currentStatus = viewModel.matchingStatus.value;
+          Widget statusView = _buildViewForStatus(currentStatus);
 
-      // Render different views based on the current matching status
-      Widget statusView = _buildViewForStatus(currentStatus);
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                statusView,
+                const SizedBox(height: 24),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
 
-      return SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 150), // 하단에 32px 패딩 추가
-        child: Column(
-          children: [
-            statusView,
-            // 네이버 지도 컴포넌트
-            SizedBox(height: 24),
-            // RecentPloggingView(),
-            // const NaverMapComponent(height: 300),
-          ],
-        ),
-      );
-    });
+  /// 현재 한국시간 기반으로 다음 시간 계산
+  int getNextHour() {
+    // 한국 시간으로 초기화
+    final now = tz.TZDateTime.now(tz.getLocation('Asia/Seoul'));
+
+    // 현재 시간이 몇 분인지 확인
+    if (now.minute > 0) {
+      return (now.hour + 1) % 24; // 다음 시간으로 넘어감
+    }
+    return now.hour; // 현재 정각 시간 유지
   }
 
   Widget _buildViewForStatus(EMatchingStatus status) {
@@ -102,11 +118,13 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
 
   /// DEFAULT View
   Widget _buildDefaultView() {
+    final nextHour = getNextHour();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          '얼쑤얼쑤팀은 현재\n플로깅을 쉬고 있어요!',
+          '${viewModel.teamInfoState.value.teamName}팀은 현재\n플로깅을 쉬고 있어요!',
           style: FontSystem.H1.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),
@@ -116,7 +134,7 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
             viewModel.requestRandomMatching();
             Get.snackbar('랜덤 매칭', '랜덤 매칭 요청이 실행되었습니다.');
           },
-          text: '7시 플로깅 랜덤매칭 하기',
+          text: '$nextHour시 플로깅 랜덤매칭 하기',
           icon: Image.asset(
             'assets/images/matching_dice_image.png',
             width: 36,
@@ -130,7 +148,7 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
         ),
         const SizedBox(height: 16),
         RoundedRectangleTextButton(
-          text: '7시 플로깅 지정매칭 하기',
+          text: '$nextHour시 플로깅 지정매칭 하기',
           icon: Image.asset(
             'assets/images/matching_target_image.png',
             width: 36,
@@ -146,20 +164,40 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
           },
         ),
         const SizedBox(height: 16),
+        RoundedRectangleTextButton(
+          text: '지금 플로깅 혼자하러 가기',
+          icon: Image.asset(
+            'assets/images/matching_plogging_image.png',
+            width: 36,
+            height: 36,
+          ),
+          backgroundColor: Colors.white,
+          textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
+          borderRadius: 16.0,
+          borderWidth: 0.7,
+          borderColor: ColorSystem.main,
+          onPressed: () {
+            Get.toNamed(AppRoutes.PLOGGING);
+          },
+        ),
+        const SizedBox(height: 16),
         RealTimeTeamActivitySection(),
         const PreviewPloggingMap(),
         const RecentPloggingPreview(),
       ],
     );
   }
+}
 
-  /// WAITING View
-  Widget _buildWaitingView() {
+/// WAITING View
+class _buildWaitingView extends BaseWidget<MatchingGroupViewModel> {
+  @override
+  Widget buildView(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          '얼쑤얼쑤팀은 현재\n7시 플로깅 매칭중이에요!',
+          '${viewModel.teamInfoState.value.teamName}은 현재\n7시 플로깅 매칭중이에요!',
           style: FontSystem.H1.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),

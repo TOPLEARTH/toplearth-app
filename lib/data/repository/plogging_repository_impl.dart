@@ -4,6 +4,7 @@ import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/data/provider/plogging/plogging_remote_provider.dart';
 import 'package:toplearth/domain/condition/plogging/finish_plogging_condition.dart';
 import 'package:toplearth/domain/condition/plogging/plogging_labeling_condition.dart';
+import 'package:toplearth/domain/condition/plogging/plogging_report_condition.dart';
 import 'package:toplearth/domain/condition/plogging/start_individual_plogging_condition.dart';
 import 'package:toplearth/domain/condition/plogging/upload_plogging_image_condition.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_image_list_state.dart';
@@ -112,5 +113,21 @@ class PloggingRepositoryImpl extends GetxService implements PloggingRepository {
     PloggingImageListState state = PloggingImageListState.fromJson(response.data!);
 
     return StateWrapper.fromResponseAndState(response, state);
+  }
+
+  @override
+  Future<StateWrapper<void>> reportPlogging(PloggingReportCondition condition) async {
+    ResponseWrapper response = await _ploggingRemoteProvider.reportPlogging(
+      ploggingId: condition.ploggingId,
+    );
+
+    if (!response.success) {
+      return StateWrapper(
+        success: false,
+        message: response.message,
+      );
+    }
+
+    return StateWrapper.fromResponse(response);
   }
 }

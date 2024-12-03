@@ -56,7 +56,6 @@ abstract class BaseConnect extends GetConnect {
       if (usedAuthorization == "true") {
         headers["Authorization"] = "Bearer ${_systemProvider.getAccessToken()}";
       }
-
       debugPrint('current accessToken: ${_systemProvider.getAccessToken()}' );
 
       // Splash Screen 처리

@@ -1,5 +1,6 @@
 import 'package:toplearth/domain/condition/plogging/finish_plogging_condition.dart';
 import 'package:toplearth/domain/condition/plogging/plogging_labeling_condition.dart';
+import 'package:toplearth/domain/condition/plogging/plogging_report_condition.dart';
 import 'package:toplearth/domain/condition/plogging/start_individual_plogging_condition.dart';
 import 'package:toplearth/domain/condition/plogging/upload_plogging_image_condition.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_image_list_state.dart';
@@ -18,4 +19,6 @@ abstract class PloggingRepository {
   Future<StateWrapper<PloggingImageListState>> finishPlogging(FinishPloggingCondition condition);
 
   Future<StateWrapper<void>> labelingPloggingImages(PloggingLabelingCondition condition);
+
+  Future<StateWrapper<void>> reportPlogging(PloggingReportCondition condition);
 }

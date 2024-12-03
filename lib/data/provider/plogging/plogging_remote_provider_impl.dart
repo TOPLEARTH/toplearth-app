@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:toplearth/app/utility/log_util.dart';
 import 'package:toplearth/core/provider/base_connect.dart';
 import 'package:toplearth/core/wrapper/response_wrapper.dart';
 import 'package:toplearth/data/provider/plogging/plogging_remote_provider.dart';
@@ -123,6 +124,24 @@ class PloggingRemoteProviderImpl extends BaseConnect
     Response response = await patch(
       "/api/v1/plogging/$ploggingId",
       body,
+      headers: BaseConnect.usedAuthorization,
+    );
+
+    print('response: $response');
+
+    LogUtil.printJsonDataType(response.body);
+
+    return ResponseWrapper.fromJson(response.body);
+  }
+
+  // 플로깅 신고
+  @override
+  Future<ResponseWrapper> reportPlogging({
+    required int ploggingId,
+  }) async {
+    Response response = await post(
+      "/api/v1/plogging/$ploggingId/reports",
+      {},
       headers: BaseConnect.usedAuthorization,
     );
     return ResponseWrapper.fromJson(response.body);

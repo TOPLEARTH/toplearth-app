@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:toplearth/presentation/view/plogging/plogging_screen.dart';
 import 'package:toplearth/test_code/NaverMapScreen.dart';
 
 class LocalPushNotifications {
@@ -50,7 +51,7 @@ class LocalPushNotifications {
     if (payload != null) {
       switch (payload) {
         case '':
-          Get.to(() => NaverMapScreen());
+          Get.to(() => const PloggingScreen());
           break;
         default:
           debugPrint("Unhandled payload: $payload");

@@ -167,6 +167,7 @@ abstract class NotificationUtil {
 
     if (message.data.containsKey('matchingId')) {
       print('matchingId: ${message.data['matchingId']}');
+      print('matchedTeamName: ${message.data['matchedTeamName']}');
 
       // Update matching status
       matchingGroupVM.setMatchingStatus(EMatchingStatus.MATCHED);

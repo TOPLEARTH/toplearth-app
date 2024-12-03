@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/presentation/view_model/store/store_view_model.dart';
+import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 
-class StoreDetailScreen extends BaseWidget<StoreViewModel>{
-  final int point = 1000;
+class StoreDetailScreen extends BaseWidget<StoreViewModel> {
+  late final String title;
+  late final int point;
+  late final String imagePath;
+
+  StoreDetailScreen({Key? key}) : super(key: key) {
+    final arguments = Get.arguments ?? {};
+    title = arguments['title'] ?? "상품명";
+    point = arguments['point'] ?? 0;
+    imagePath = arguments['imagePath'] ?? "";
+  }
 
   @override
   Widget buildView(BuildContext context) {
@@ -14,7 +25,7 @@ class StoreDetailScreen extends BaseWidget<StoreViewModel>{
     final screenWidth = mediaQuery.size.width;
 
     final String formattedDate =
-    DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: 3)));
+        DateFormat('yyyy-MM-dd').format(DateTime.now().add(Duration(days: 3)));
 
     return Scaffold(
       appBar: AppBar(
@@ -29,15 +40,15 @@ class StoreDetailScreen extends BaseWidget<StoreViewModel>{
             children: [
               Center(
                 child: Image.asset(
-                  'assets/img/shopping/ab.png',
+                  imagePath,
                   width: screenWidth * 0.7, // 화면 비율에 맞게 조정
-                  height: screenHeight * 0.2,
+                  height: screenHeight * 0.25,
                   fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                "포인트 교환",
+                title,
                 style: TextStyle(
                   fontSize: screenWidth * 0.05, // 화면 너비에 비례한 폰트 크기
                   fontWeight: FontWeight.bold,
@@ -72,37 +83,60 @@ class StoreDetailScreen extends BaseWidget<StoreViewModel>{
                 onTap: () => _showAccountDialog(context),
               ),
               const SizedBox(height: 16),
-              Center(
-                child: Image.asset(
-                  'assets/img/shopping/exchange.png',
-                  width: screenWidth * 0.85, // 화면 비율에 맞게 조정
-                  height: screenHeight * 0.25,
-                  fit: BoxFit.cover,
+              // Replace the image with note text
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '''
+- 포인트를 교환 신청하시면 교환될 때까지 신청한 만큼 포인트가 차감됩니다.
+- 반드시 본인 명의의 계좌로만 교환이 가능합니다.
+- 계좌번호 및 은행 정보를 잘못 입력했을 경우 교환에 실패해 포인트는 반환되지 않으니 정확한 정보를 입력해 주시기 바랍니다.
+- 교환 신청 후, 교환 완료되기 전에 탈퇴하거나 탈퇴된 경우, 포인트는 교환되지 못하고 소멸됩니다.
+- 포인트 교환 신청 후 변경 또는 취소가 불가능합니다.
+                  ''',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+              RoundedRectangleTextButton(
+                text: "교환하기",
+                width: double.infinity,
+                backgroundColor: ColorSystem.main,
                 onPressed: () async {
                   // 포인트 교환 호출
                   await viewModel.requestPointExchange(point);
-                  _showResultDialog(context, true); // 성공 여부를 대체로 전달
                 },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, screenHeight * 0.06),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  backgroundColor: Colors.blue,
-                ),
-                child: Text(
-                  "교환하기",
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.045,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
               ),
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     // 포인트 교환 호출
+              //     await viewModel.requestPointExchange(point);
+              //     _showResultDialog(context, true); // 성공 여부를 대체로 전달
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     minimumSize: Size(double.infinity, screenHeight * 0.06),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     backgroundColor: Colors.blue,
+              //   ),
+              //   child: Text(
+              //     "교환하기",
+              //     style: TextStyle(
+              //       fontSize: screenWidth * 0.045,
+              //       fontWeight: FontWeight.bold,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -157,9 +191,9 @@ class StoreDetailScreen extends BaseWidget<StoreViewModel>{
                 value: selectedBank,
                 items: ["은행 선택", "신한은행", "국민은행", "우리은행"]
                     .map((bank) => DropdownMenuItem(
-                  value: bank,
-                  child: Text(bank),
-                ))
+                          value: bank,
+                          child: Text(bank),
+                        ))
                     .toList(),
                 onChanged: (value) {
                   if (value != null) {
@@ -177,7 +211,9 @@ class StoreDetailScreen extends BaseWidget<StoreViewModel>{
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+              RoundedRectangleTextButton(
+                backgroundColor: ColorSystem.main,
+                text: '계좌 번호 저장',
                 onPressed: () async {
                   await viewModel.updateBankAccount(
                     selectedBank,
@@ -186,11 +222,21 @@ class StoreDetailScreen extends BaseWidget<StoreViewModel>{
                   Navigator.pop(context);
                   _showResultDialog(context, true);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                ),
-                child: const Text("저장"),
               ),
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     await viewModel.updateBankAccount(
+              //       selectedBank,
+              //       accountController.text.trim(),
+              //     );
+              //     Navigator.pop(context);
+              //     _showResultDialog(context, true);
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.green,
+              //   ),
+              //   child: const Text("저장"),
+              // ),
             ],
           ),
         );

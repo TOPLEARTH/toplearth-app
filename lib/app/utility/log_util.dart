@@ -19,4 +19,26 @@ abstract class LogUtil {
   static void error(dynamic message) {
     _logger.e(message);
   }
+
+  // Print JSON data type
+  static void printJsonDataType(Map<String, dynamic> json) {
+    json.forEach((key, value) {
+      if (value is List) {
+        print('Key: $key, Type: List, Length: ${value.length}');
+        for (var item in value) {
+          if (item is Map<String, dynamic>) {
+            print('  $key List item is Map:');
+            printJsonDataType(item);
+          } else {
+            print('  $key List item type: ${item.runtimeType}');
+          }
+        }
+      } else if (value is Map<String, dynamic>) {
+        print('Key: $key, Type: Map');
+        printJsonDataType(value);
+      } else {
+        print('Key: $key, Type: ${value.runtimeType}');
+      }
+    });
+  }
 }

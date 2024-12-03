@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 
 class PloggingLabelingCondition {
   final int ploggingId; // 플로깅 ID
-  final File ploggingImage; // 업로드할 이미지 파일
+  final File ploggingImage; // 업로드할 스크린샷 이미지 파일
   final List<int> ploggingImageIds; // 이미지 ID 리스트
   final List<String> labels; // 라벨 리스트
 
