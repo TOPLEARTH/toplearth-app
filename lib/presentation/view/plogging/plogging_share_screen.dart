@@ -40,7 +40,8 @@ Future<File?> combineImages(Uint8List flutterImage, Uint8List mapImage) async {
     final picture = recorder.endRecording();
     final image = await picture.toImage(
         mapDecoded.width,
-        mapDecoded.height + flutterDecoded.height); // Combined height of both images
+        mapDecoded.height +
+            flutterDecoded.height); // Combined height of both images
     final byteData = await image.toByteData(format: ImageByteFormat.png);
 
     if (byteData == null) return null;
@@ -132,7 +133,7 @@ class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
     try {
       // Capture Flutter screenshot
       final flutterScreenshot =
-      await viewModel.screenshotController.capture(pixelRatio: 1.5);
+          await viewModel.screenshotController.capture(pixelRatio: 1.5);
       if (flutterScreenshot == null) {
         Get.snackbar('오류', 'Flutter UI 스크린샷 캡처에 실패했습니다.');
         return null;
@@ -147,7 +148,7 @@ class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
 
       // Combine screenshots
       final combinedScreenshotFile =
-      await combineImages(flutterScreenshot, mapScreenshot);
+          await combineImages(flutterScreenshot, mapScreenshot);
       return combinedScreenshotFile;
     } catch (e) {
       Get.snackbar('오류', '스크린샷 처리 중 문제가 발생했습니다: $e');
@@ -171,7 +172,7 @@ class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
             ),
             const SizedBox(height: 8),
             _buildSummaryRow(
-                '거리', '${viewModel.distance.toStringAsFixed(1)} km'),
+                '거리', '${viewModel.distance.toStringAsFixed(3)} km'),
             _buildSummaryRow(
                 '시간', _formatDuration(viewModel.ploggingTime.value)),
             _buildSummaryRow('수거한 쓰레기', '${viewModel.pickUpCnt}개'),
