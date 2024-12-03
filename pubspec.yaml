@@ -107,6 +107,7 @@ dependencies:
   # geolocation
   geocoding: ^3.0.0
   web_socket_channel: ^2.4.0
+  keyboard_avoider: ^0.2.0
 
 dev_dependencies:
   # Default
@@ -136,6 +137,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/shares/
+    - assets/images/shares/plogging/
     - assets/images/seoul/
     - assets/images/quest/
     - assets/images/labeling/
