@@ -27,7 +27,7 @@ class BuildDefaultView extends BaseWidget<MatchingGroupViewModel> {
         RoundedRectangleTextButton(
           onPressed: () {
             viewModel.requestRandomMatching();
-            Get.snackbar('랜덤 매칭', '랜덤 매칭 요청이 실행되었습니다.');
+            // Get.snackbar('랜덤 매칭', '랜덤 매칭 요청이 실행되었습니다.');
           },
           text: '$nextHour 시 플로깅 랜덤매칭 하기',
           icon: Image.asset(
@@ -55,7 +55,7 @@ class BuildDefaultView extends BaseWidget<MatchingGroupViewModel> {
           borderWidth: 0.7,
           borderColor: ColorSystem.main,
           onPressed: () {
-            Get.snackbar('지정 매칭', '지정 매칭 요청이 실행되었습니다.');
+            // Get.snackbar('지정 매칭', '지정 매칭 요청이 실행되었습니다.');
           },
         ),
         const SizedBox(height: 16),

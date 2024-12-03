@@ -7,6 +7,7 @@ import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/domain/entity/quest/quest_state.dart';
 import 'package:toplearth/presentation/view/my_page/my_page_calendar.dart';
 import 'package:toplearth/presentation/view_model/my_page/my_page_view_model.dart';
+import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 import 'package:toplearth/presentation/widget/appbar/default_back_app_bar.dart';
 
 class MyPageScreen extends BaseScreen<MyPageViewModel> {
@@ -14,7 +15,7 @@ class MyPageScreen extends BaseScreen<MyPageViewModel> {
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) {
-    return const DefaultBackAppBar();
+    return const DefaultAppBar();
   }
 
   @override

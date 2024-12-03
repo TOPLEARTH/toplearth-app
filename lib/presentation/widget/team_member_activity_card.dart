@@ -1,19 +1,61 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 // 팀원 활동 카드 위젯
-class TeamMemberActivityCard extends StatelessWidget {
+class TeamMemberActivityCard extends StatefulWidget {
   final String name;
-  final double progress;
-  final bool isActive; // true면 초록색(활동 중), false면 빨간색(쉬는 중)
-  final String statusText;
+  final double distance; // 초기 거리
+  final bool isActive;
+  final bool isPlogging; // 플로깅 여부 추가 (기본값: false)
 
   const TeamMemberActivityCard({
     Key? key,
     required this.name,
-    required this.progress,
+    required this.distance, // 초기 거리
     required this.isActive,
-    required this.statusText,
+    this.isPlogging = false, // 기본값을 false로 설정
   }) : super(key: key);
+
+  @override
+  _TeamMemberActivityCardState createState() => _TeamMemberActivityCardState();
+}
+
+class _TeamMemberActivityCardState extends State<TeamMemberActivityCard> {
+  double progress = 0.0; // 진행률 (0.0 ~ 1.0)
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isPlogging) {
+      startProgressBar();
+    }
+  }
+
+  void startProgressBar() {
+    // name이 '홍규진'이면 1초에 1%, 그렇지 않으면 3초에 1%
+    final duration = widget.name == '홍규진'
+        ? const Duration(seconds: 1)
+        : const Duration(seconds: 3);
+
+    _timer = Timer.periodic(duration, (_) {
+      if (mounted) {
+        setState(() {
+          progress += 0.01; // 1%씩 증가
+          if (progress >= 1.0) {
+            _timer?.cancel(); // 최대값 도달 시 타이머 종료
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // 타이머 해제
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +75,7 @@ class TeamMemberActivityCard extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    name,
+                    widget.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -44,14 +86,16 @@ class TeamMemberActivityCard extends StatelessWidget {
                   // 상태 점
                   Icon(
                     Icons.circle,
-                    color: isActive ? Colors.green : Colors.red,
+                    color: widget.isActive ? Colors.green : Colors.red,
                     size: 10,
                   ),
                 ],
               ),
-              // 진행률 또는 상태 텍스트
+              // 거리 또는 상태 텍스트
               Text(
-                isActive ? '${(progress * 10).toStringAsFixed(1)}km' : statusText,
+                widget.isActive
+                    ? '${(widget.distance + progress * 10).toStringAsFixed(1)}km'
+                    : '현재 플로깅을 쉬고 있어요',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -60,11 +104,11 @@ class TeamMemberActivityCard extends StatelessWidget {
               ),
             ],
           ),
-          if (isActive) ...[
+          if (widget.isActive && widget.isPlogging) ...[
             const SizedBox(height: 8),
             // 진행률 바
             UserProgressBar(
-              progress: progress / 10,
+              progress: progress.clamp(0.0, 1.0), // 진행률 제한 (0.0 ~ 1.0)
               backgroundColor: const Color(0xFF203759),
               progressColor: Colors.green,
               height: 8,
@@ -115,54 +159,6 @@ class UserProgressBar extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// 메인 스크린
-class TeamActivityScreen extends StatelessWidget {
-  const TeamActivityScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // 더미 데이터
-    final members = [
-      {'name': '김무로', 'progress': 5.2, 'isActive': true, 'statusText': ''},
-      {'name': '김신공', 'progress': 10.2, 'isActive': true, 'statusText': ''},
-      {'name': '김동국', 'progress': 0.0, 'isActive': false, 'statusText': '현재 플로깅을 쉬고 있어요'},
-      {'name': '김경희', 'progress': 0.0, 'isActive': false, 'statusText': '현재 플로깅을 쉬고 있어요'},
-    ];
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('실시간 팀원 활동'),
-        backgroundColor: const Color(0xFF0F2A4F),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '실시간 팀원 활동',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // 팀원 활동 카드 리스트
-            ...members.map((member) {
-              return TeamMemberActivityCard(
-                name: member['name'] as String,
-                progress: member['progress'] as double,
-                isActive: member['isActive'] as bool,
-                statusText: member['statusText'] as String,
-              );
-            }).toList(),
-          ],
-        ),
-      ),
     );
   }
 }

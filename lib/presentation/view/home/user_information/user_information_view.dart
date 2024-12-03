@@ -52,7 +52,7 @@ class HomeUserInfoView extends BaseWidget<HomeViewModel> {
                 child: const Text(
                   '목표 설정하기',
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: ColorSystem.sub,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

@@ -7,24 +7,29 @@ import 'package:toplearth/presentation/widget/image/svg_image_view.dart';
 class CustomBottomNavigationBar extends BaseWidget<RootViewModel> {
   const CustomBottomNavigationBar({super.key});
 
-  @override
   Widget buildView(BuildContext context) {
     return Container(
-      height: 88,
-      margin: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: GetPlatform.isAndroid ? 20 : 32,
-      ),
-      decoration: const BoxDecoration(
+      height: 120,
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)), // 모서리 둥글게 설정
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: const Offset(0, 4),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: Row(
         children: _buildItemViews(),
       ),
     );
   }
+
+
+
 
   List<Widget> _buildItemViews() {
     // Names for bottom navigation items
@@ -96,3 +101,23 @@ class CustomBottomNavigationBar extends BaseWidget<RootViewModel> {
     );
   }
 }
+
+
+// @override
+// Widget buildView(BuildContext context) {
+//   return Container(
+//     height: 88,
+//     margin: EdgeInsets.only(
+//       left: 16,
+//       right: 16,
+//       bottom: GetPlatform.isAndroid ? 20 : 32,
+//     ),
+//     decoration: const BoxDecoration(
+//       color: Colors.white,
+//       borderRadius: BorderRadius.all(Radius.circular(20)),
+//     ),
+//     child: Row(
+//       children: _buildItemViews(),
+//     ),
+//   );
+// }

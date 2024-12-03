@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -9,61 +8,25 @@ import 'package:screenshot/screenshot.dart';
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
+import 'package:toplearth/core/wrapper/result_wrapper.dart';
+import 'package:toplearth/domain/condition/plogging/plogging_labeling_condition.dart';
+import 'package:toplearth/domain/entity/matching/matching_status_state.dart';
+import 'package:toplearth/domain/type/e_matching_status.dart';
+import 'package:toplearth/presentation/view/matching/MapControllerManager.dart';
+import 'package:toplearth/presentation/view/plogging/ShareBottomSheet.dart';
+import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 import 'package:toplearth/presentation/view_model/plogging/naver_map_component.dart';
+import 'package:flutter/rendering.dart';
 import 'package:toplearth/presentation/view_model/plogging/plogging_view_model.dart';
+import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 import 'package:toplearth/presentation/widget/dialog/plogging_share_dialog.dart';
-
-Future<String?> getApplicationDocumentsPath() async {
-  final directory = await getApplicationDocumentsDirectory();
-  return directory.path;
-}
-
-Future<File?> combineImages(Uint8List flutterImage, Uint8List mapImage) async {
-  try {
-    // Decode the images
-    final flutterDecoded = await decodeImageFromList(flutterImage);
-    final mapDecoded = await decodeImageFromList(mapImage);
-
-    // Create a canvas to combine the images
-    final recorder = PictureRecorder();
-    final canvas = Canvas(recorder);
-
-    // Draw the map image
-    canvas.drawImage(mapDecoded, Offset(0, 0), Paint());
-
-    // Draw the Flutter UI image below the map image
-    final flutterImageOffset = Offset(0, mapDecoded.height.toDouble());
-    canvas.drawImage(flutterDecoded, flutterImageOffset, Paint());
-
-    // Convert the combined image to bytes
-    final picture = recorder.endRecording();
-    final image = await picture.toImage(
-        mapDecoded.width,
-        mapDecoded.height +
-            flutterDecoded.height); // Combined height of both images
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
-
-    if (byteData == null) return null;
-
-    // Save to file
-    final directory = await getApplicationDocumentsPath();
-    if (directory == null) return null;
-    final filePath =
-        '$directory/combined_screenshot_${DateTime.now().millisecondsSinceEpoch}.png';
-    final file = File(filePath);
-    await file.writeAsBytes(byteData.buffer.asUint8List());
-
-    return file;
-  } catch (e) {
-    debugPrint('Error combining images: $e');
-    return null;
-  }
-}
 
 class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
   late final List<int> imageIds;
   late final List<String> labels;
+  final PloggingViewModel viewModel =
+      Get.put(PloggingViewModel()); // ViewModel 초기화
 
   PloggingShareScreen({Key? key}) : super(key: key) {
     final arguments = Get.arguments ?? {};
@@ -103,7 +66,7 @@ class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
               controller: viewModel.screenshotController,
               child: Stack(
                 children: [
-                  NaverMapComponent(), // Make sure NaverMapComponent exposes a controller
+                  NaverMapComponent(), // 지도 컴포넌트
                   Positioned(
                     bottom: 16,
                     left: 16,
@@ -116,12 +79,58 @@ class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: RoundedRectangleTextButton(
-              width: double.infinity,
-              onPressed: () {
-                Get.offAllNamed(AppRoutes.ROOT);
-              },
-              text: '홈으로 이동하기',
+            child: Column(
+              children: [
+                // 공유하기 버튼
+                RoundedRectangleTextButton(
+                  backgroundColor: ColorSystem.main,
+                  width: double.infinity,
+                  onPressed: () async {
+                    final screenshotFile = await _processScreenshots();
+                    if (screenshotFile != null) {
+                      // 바텀시트 호출
+                      Get.bottomSheet(
+                        PloggingShareDialog(screenshotFile: screenshotFile),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  text: '이미지 공유하기',
+                ),
+                const SizedBox(height: 12), // 버튼 간 간격 추가
+                // 홈으로 이동하기 버튼
+                RoundedRectangleTextButton(
+                  backgroundColor: ColorSystem.main,
+                  width: double.infinity,
+                  onPressed: () async {
+                    final screenshotFile = await _processScreenshots();
+                    if (screenshotFile != null) {
+                      final result = await labelingPloggingImages(
+                        imageIds,
+                        labels,
+                        screenshotFile,
+                      );
+                      if (result.success) {
+                        final matchingGroupVM = Get.find<MatchingGroupViewModel>();
+                        final rootVM = Get.find<RootViewModel>();
+
+                        matchingGroupVM.setMatchingStatus(EMatchingStatus.DEFAULT); // 상태 변경
+                        rootVM.matchingStatusState.value = MatchingStatusState(
+                          status: EMatchingStatus.DEFAULT, // 상태 초기화
+                        );
+                        Get.offAllNamed(AppRoutes.ROOT);
+                      } else {
+
+                      }
+                    }
+                  },
+                  text: '홈으로 이동하기',
+                ),
+              ],
             ),
           ),
         ],
@@ -129,30 +138,63 @@ class PloggingShareScreen extends BaseScreen<PloggingViewModel> {
     );
   }
 
+
   Future<File?> _processScreenshots() async {
     try {
-      // Capture Flutter screenshot
+      // Flutter UI 스크린샷 캡처
       final flutterScreenshot =
           await viewModel.screenshotController.capture(pixelRatio: 1.5);
       if (flutterScreenshot == null) {
-        Get.snackbar('오류', 'Flutter UI 스크린샷 캡처에 실패했습니다.');
         return null;
       }
 
-      // Capture map screenshot using NaverMapController
-      final mapScreenshot = await viewModel.screenshotController.capture();
-      if (mapScreenshot == null) {
-        Get.snackbar('오류', '지도 스크린샷 캡처에 실패했습니다.');
-        return null;
-      }
+      // 캡처한 스크린샷 데이터를 파일로 저장
+      final directory = await getTemporaryDirectory();
+      final filePath =
+          '${directory.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File(filePath);
+      await file.writeAsBytes(flutterScreenshot);
 
-      // Combine screenshots
-      final combinedScreenshotFile =
-          await combineImages(flutterScreenshot, mapScreenshot);
-      return combinedScreenshotFile;
+      return file; // 파일 반환
     } catch (e) {
-      Get.snackbar('오류', '스크린샷 처리 중 문제가 발생했습니다: $e');
       return null;
+    }
+  }
+
+  Future<ResultWrapper> labelingPloggingImages(
+    List<int> imageIds,
+    List<String> labels,
+    File screenshotFile,
+  ) async {
+    if (imageIds.isEmpty ||
+        labels.isEmpty ||
+        imageIds.length != labels.length) {
+      return ResultWrapper(
+        success: false,
+        message: '이미지 ID와 라벨 리스트가 유효하지 않거나 크기가 일치하지 않습니다.',
+      );
+    }
+
+    try {
+      final state = await viewModel.labelingPloggingImages(
+          imageIds, labels, screenshotFile);
+
+      if (!state.success) {
+        return ResultWrapper(
+          success: false,
+          message: state.message,
+        );
+      }
+
+      return ResultWrapper(
+        success: true,
+        message: '라벨링 및 스크린샷 저장이 성공적으로 처리되었습니다.',
+      );
+    } catch (e) {
+      return ResultWrapper(
+        success: false,
+        message: '처리 중 오류 발생: $e',
+      );
     }
   }
 

@@ -234,6 +234,8 @@ class PloggingViewModel extends GetxController {
         ),
       );
 
+      print('bro succeed');
+
       if (!state.success) {
         return ResultWrapper(
           success: false,

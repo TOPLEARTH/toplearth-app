@@ -6,17 +6,10 @@ class MatchedViewController extends GetxController {
   Rx<Duration> countdownTime = const Duration(hours: 1, minutes: 30).obs;
   Timer? _timer;
 
-  // Progress Bar Data (Dynamic Updates via Socket)
+  // Progress Bar Data (Dynamic Updates via Sockeft)
   RxDouble teamAProgress = 50.0.obs;
   RxDouble teamBProgress = 50.0.obs;
 
-  // Team Member Activity
-  RxList<Map<String, dynamic>> members = [
-    {'name': '김무로', 'progress': 5.2, 'isActive': true, 'statusText': ''},
-    {'name': '김신공', 'progress': 10.2, 'isActive': true, 'statusText': ''},
-    {'name': '김동국', 'progress': 0.0, 'isActive': false, 'statusText': '현재 플로깅을 쉬고 있어요'},
-    {'name': '김경희', 'progress': 0.0, 'isActive': false, 'statusText': '현재 플로깅을 쉬고 있어요'},
-  ].obs;
 
   void startCountdown() {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {

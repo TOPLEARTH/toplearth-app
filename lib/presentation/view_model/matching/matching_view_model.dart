@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/utility/log_util.dart';
 import 'package:toplearth/core/provider/base_socket.dart';
@@ -37,14 +38,15 @@ class MatchingGroupViewModel extends GetxController {
   /* ------------------------------------------------------ */
   /* Managed State ---------------------------------------- */
   /* ------------------------------------------------------ */
-  late final RxInt teamId = 0.obs; // 관리되는 팀 ID
+  late final RxInt teamId = 0.obs;
+  late final Rx<TeamInfoState> teamInfoState = TeamInfoState.initial().obs;
+
   late final RxInt opponentTeamId = 0.obs; // 관리되는 상대 팀 ID
   late final RxString opponentTeamName = "".obs; // 관리되는 상대 팀 이름
   late final Rx<EMatchingStatus> matchingStatus = EMatchingStatus.DEFAULT.obs;
   late final Rx<RecentMatchingInfoState> recentPloggingList =
       RecentMatchingInfoState(recentMatchingInfo: []).obs;
   RxBool isWebSocketConnected = false.obs;
-  Rx<TeamInfoState> teamInfoState = TeamInfoState.initial().obs;
   /* ------------------------------------------------------ */
   /* Lifecycle Methods ------------------------------------ */
   /* ------------------------------------------------------ */
@@ -68,6 +70,8 @@ class MatchingGroupViewModel extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
+    _rootViewModel = Get.find<RootViewModel>();
+
     // DI 주입
     _matchingByRandomUseCase = Get.find<MatchingByRandomUseCase>();
     _matchingByDesignatedUseCase = Get.find<MatchingByDesignatedUseCase>();
@@ -76,21 +80,34 @@ class MatchingGroupViewModel extends GetxController {
     _matchingVsFinishUseCase = Get.find<MatchingVsFinishUseCase>();
     _matchingRecentPloggingUseCase = Get.find<MatchingRecentPloggingUseCase>();
 
-    _rootViewModel = Get.find<RootViewModel>();
+    final rootViewModel = Get.find<RootViewModel>();
 
     // RootViewModel에서 teamInfoState 상태 구독
-    ever(_rootViewModel.teamInfoState, (TeamInfoState newTeamState) {
-      teamInfoState.value = newTeamState;
-      print("TeamInfoState Updated: ${newTeamState.teamName}");
+    teamId.value = rootViewModel.teamInfoState.value.teamId ?? 0; // 초기값 설정
+    teamInfoState.value =
+        rootViewModel.teamInfoState.value; // teamInfoState 초기값 동기화
+
+    debugPrint('MatchingGroupViewModel: 초기 teamId: ${teamId.value}');
+    debugPrint(
+        'MatchingGroupViewModel: 초기 teamInfoState: ${teamInfoState.value}');
+
+    // teamInfoState 변경 시 동기화
+    ever(rootViewModel.teamInfoState, (TeamInfoState updatedTeamInfoState) {
+      teamId.value = updatedTeamInfoState.teamId ?? 0;
+      teamInfoState.value = updatedTeamInfoState;
+
+      debugPrint(
+          'MatchingGroupViewModel: teamInfoState 업데이트: $updatedTeamInfoState');
+      debugPrint('MatchingGroupViewModel: teamId 업데이트: ${teamId.value}');
     });
 
     // Fetch recent plogging information
     await getRecentPlogging();
 
-    // 매칭 상태 업데이트
+    // 매칭 상태 업데이트 구독
     ever(_rootViewModel.matchingStatusState,
         (MatchingStatusState newMatchingStatusState) {
-      print('MatchingViewModel 상태 감지: ${newMatchingStatusState.status}');
+      debugPrint('MatchingViewModel 상태 감지: ${newMatchingStatusState.status}');
       switch (newMatchingStatusState.status) {
         case EMatchingStatus.NOT_JOINED:
           matchingStatus.value = EMatchingStatus.NOT_JOINED;
@@ -115,6 +132,7 @@ class MatchingGroupViewModel extends GetxController {
           break;
       }
     });
+
     super.onInit();
 
     // // WebSocketController 초기화 및 연결
@@ -221,11 +239,17 @@ class MatchingGroupViewModel extends GetxController {
         message: "팀 ID가 설정되지 않았습니다.",
       );
     }
+
+    print('deubt: ${teamId.value}');
+
     StateWrapper<MatchingStatusState> state = await _matchingByRandomUseCase
         .execute(RandomMatchingCondition(teamId: teamId.value));
     _rootViewModel.matchingStatusState.value = MatchingStatusState(
       status: state.data!.status,
     );
+
+    print('sibal: ${state.data!.status}');
+
     print("랜덤 매칭 요청 성공: ${state.data!.status}");
     _rootViewModel.matchingStatusState.value =
         MatchingStatusState(status: state.data!.status);

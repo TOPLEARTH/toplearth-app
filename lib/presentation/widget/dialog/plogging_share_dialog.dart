@@ -69,6 +69,8 @@ class PloggingShareDialog extends StatelessWidget {
                 iconPath: 'assets/images/shares/plogging/share_instagram_icon.png',
                 label: '인스타그램',
                 onTap: () => _shareInstagram(),
+                width: 64,
+                height: 64,
               ),
               _buildShareButton(
                 iconPath: 'assets/images/shares/plogging/share_thread_icon.png',
@@ -86,6 +88,8 @@ class PloggingShareDialog extends StatelessWidget {
     required String iconPath,
     required String label,
     required VoidCallback onTap,
+    double? width, // 옵셔널 width
+    double? height, // 옵셔널 height
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -93,8 +97,8 @@ class PloggingShareDialog extends StatelessWidget {
         children: [
           PngImageView(
             assetPath: iconPath,
-            width: 48,
-            height: 48,
+            width: width ?? 48, // 기본값 48
+            height: height ?? 48, // 기본값 48
           ),
           const SizedBox(height: 4),
           Text(
@@ -132,14 +136,14 @@ class PloggingShareDialog extends StatelessWidget {
 
       // Check if KakaoTalk is installed and share
       bool isKakaoTalkAvailable =
-          await ShareClient.instance.isKakaoTalkSharingAvailable();
+      await ShareClient.instance.isKakaoTalkSharingAvailable();
       if (isKakaoTalkAvailable) {
         Uri uri = await ShareClient.instance.shareDefault(template: template);
         await ShareClient.instance.launchKakaoTalk(uri);
         print('카카오톡 공유 완료');
       } else {
         Uri shareUrl =
-            await WebSharerClient.instance.makeDefaultUrl(template: template);
+        await WebSharerClient.instance.makeDefaultUrl(template: template);
         await launchBrowserTab(shareUrl, popupOpen: true);
       }
     } catch (error) {

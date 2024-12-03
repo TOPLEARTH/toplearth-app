@@ -29,7 +29,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 
-
 class RootViewModel extends GetxController {
   /* ------------------------------------------------------ */
   /* ----------------- Static Fields ---------------------- */
@@ -67,11 +66,9 @@ class RootViewModel extends GetxController {
     status: EMatchingStatus.WAITING,
   ).obs;
 
-
-
   UserState get userState => _userState.value;
   QuestInfoState get questInfoState => _questInfoState.value;
-  Rx<TeamInfoState> teamInfoState = TeamInfoState.initial().obs;
+  Rx<TeamInfoState> get teamInfoState => _teamInfoState;
   PloggingInfoState get ploggingInfoState => _ploggingInfoState.value;
   LegacyInfoState get legacyInfoState => _legacyInfoState.value;
   RegionRankingInfoState get regionRankingInfoState =>
@@ -106,7 +103,6 @@ class RootViewModel extends GetxController {
     _homeInfoState = HomeInfoState.initial().obs;
     _matchingRealTimeInfoState = MatchingRealTimeInfoState.initial().obs;
 
-
     // FCM Setting
     FirebaseMessaging.onMessage
         .listen(NotificationUtil.showFlutterNotification);
@@ -135,13 +131,14 @@ class RootViewModel extends GetxController {
 
 // RootViewModel
   void updateTeamIdInMatchingGroupViewModel() {
-    // teamId를 MatchingGroupViewModel로 전달
     final matchingGroupViewModel = Get.find<MatchingGroupViewModel>();
-    matchingGroupViewModel.setTeamId(teamInfoState.value.teamId!);
 
-    // 상태가 변할 때마다 MatchingGroupViewModel에 전파
-    ever(teamInfoState, (TeamInfoState newTeamState) {
-      matchingGroupViewModel.setTeamId(newTeamState.teamId!);
+    // 초기 teamId 전달
+    matchingGroupViewModel.setTeamId(_teamInfoState.value.teamId ?? 0);
+
+    // teamInfoState 변경 시 MatchingGroupViewModel 업데이트
+    ever(_teamInfoState, (teamInfoState) {
+      matchingGroupViewModel.setTeamId(teamInfoState.teamId ?? 0);
     });
   }
 
@@ -176,7 +173,6 @@ class RootViewModel extends GetxController {
 
     latitude.value = position.latitude;
     longitude.value = position.longitude;
-
 
     // 지역 정보 가져오기
     await _fetchRegionInfo(position.latitude, position.longitude);
@@ -216,11 +212,14 @@ class RootViewModel extends GetxController {
   }
 
   @override
+  @override
   void onReady() async {
-
-    await fetchBootstrapInformation();
     super.onReady();
+
+    await fetchBootstrapInformation(); // teamInfoState를 로드
+    debugPrint('RootViewModel: teamInfoState: ${teamInfoState.value}');
   }
+
 
   Future<void> fetchBootstrapInformation() async {
     StateWrapper<BootstrapState> state = await _readBootStrapUseCase.execute();
@@ -230,7 +229,7 @@ class RootViewModel extends GetxController {
 
       _userState.value = state.data!.userInfo;
       _homeInfoState.value = state.data!.homeInfo;
-      teamInfoState.value = state.data?.teamInfo ?? TeamInfoState.initial();
+      _teamInfoState.value = state.data!.teamInfo;
       if (state.data?.teamInfo != null) {
         updateTeamIdInMatchingGroupViewModel();
       }
@@ -299,9 +298,7 @@ Future<String?> fetchRegionFromNaverAPI(double lat, double lng) async {
     try {
       final String region = data["results"][0]["region"]["area2"]["name"];
       return region; // 지역구 반환
-    } catch (e) {
-    }
-  } else {
-  }
+    } catch (e) {}
+  } else {}
   return null;
 }
