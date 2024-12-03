@@ -137,8 +137,9 @@ class LegacyScreen extends BaseScreen<LegacyViewModel> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          const SizedBox(height: 32),
           const Text(
             "함께 주운 다양한 쓰레기 종류들",
             style: TextStyle(

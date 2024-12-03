@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/font_system.dart';
+import 'package:toplearth/app/utility/date_time_util.dart';
 import 'package:toplearth/app/utility/hour_util.dart';
 import 'package:toplearth/presentation/view/root/SharedProgressBar.dart';
 import 'package:toplearth/presentation/view/root/matching_view_controller.dart';
+import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/widget/team_member_activity_card.dart';
 
 class MatchedView extends StatelessWidget {
   final MatchedViewController controller = Get.put(MatchedViewController());
+  final RootViewModel viewModel = Get.find<RootViewModel>();
   final nextHour = getNextHour();
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class MatchedView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '얼쑤얼쑤 팀과 $nextHour 시에\n플로깅 대전이 매칭되었어요!',
+          '${viewModel.matchingRealTimeInfoState.opponentTeamName} 팀과 $nextHour 시에\n플로깅 대전이 매칭되었어요!',
           style: FontSystem.H1.copyWith(color: Colors.black),
         ),
         // Match Info
@@ -32,7 +35,7 @@ class MatchedView extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                '2024.10.23 7시 플로깅 🌍',
+                '${DateTimeUtil.convertFromDateTimeToKorean(viewModel.matchingRealTimeInfoState.matchingStartedAt!)}시 플로깅 🌍',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -41,8 +44,9 @@ class MatchedView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               Text(
-                '얼쑤얼쑤 🌱 VS 디지유 🌿',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                '🍃${viewModel.matchingRealTimeInfoState.ourTeamName} vs 🌱${viewModel.matchingRealTimeInfoState.opponentTeamName}',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ],
           ),

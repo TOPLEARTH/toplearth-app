@@ -5,5 +5,6 @@ final Map<String, String> labelToEmoji = {
   "FOOD_WASTE": "🍎",
   "PLASTIC": "🥤",
   "CAN": "🛢️",
-  "GLASS": "🥃"
+  "GLASS": "🥃",
+  "UNKNOWN": "⁇",
 };
