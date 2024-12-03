@@ -175,6 +175,8 @@ abstract class NotificationUtil {
         status: EMatchingStatus.MATCHED,
       );
 
+      // Fetch updated bootstrap information
+      rootVM.fetchBootstrapInformation();
       // Set matchingId
       systemProvider.setMatchingId(message.data['matchingId']);
     }

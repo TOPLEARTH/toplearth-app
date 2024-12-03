@@ -15,6 +15,7 @@ class MainApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       // App Title
       title: AppConfig.APP_TITLE,
 
