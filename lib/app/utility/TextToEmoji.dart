@@ -6,5 +6,5 @@ final Map<String, String> labelToEmoji = {
   "PLASTIC": "🥤",
   "CAN": "🛢️",
   "GLASS": "🥃",
-  "UNKNOWN": "⁇",
+  "UNKNOWN": "🗑️️",
 };
