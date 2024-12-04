@@ -7,9 +7,10 @@ import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/domain/entity/group/member_state.dart';
 import 'package:toplearth/presentation/view_model/group/group_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
+import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
+import 'package:toplearth/presentation/widget/dialog/group_request_dialog.dart';
 import 'package:toplearth/presentation/widget/image/svg_image_view.dart';
 
-// 뷰모델 익히기용
 class GroupScreen extends BaseScreen<GroupViewModel> {
   const GroupScreen({super.key});
 
@@ -32,17 +33,24 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
 
   @override
   Widget buildBody(BuildContext context) {
-    return Obx(
-      () => SingleChildScrollView(
+    return Obx(() {
+      // teamInfoState.teamName이 초기화되지 않았으면 '그룹 설정하기' 화면 표시
+      if (viewModel.teamInfoState.teamName == '' ||
+          viewModel.teamInfoState.teamName == null) {
+        print('teamId is null');
+        return _buildNotJoinedView();
+      }
+
+      // 정상적으로 데이터를 로드한 경우
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //그룹 정보
               _buildGroupInfoSection(),
               const SizedBox(height: 16),
-              //승률 및 팀원 정보
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -55,8 +63,8 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
             ],
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildGroupInfoSection() {
@@ -85,47 +93,43 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
     );
   }
 
-  Widget _buildInfoRow(String title, String value) {
+  Widget _buildInfoRow(String title, String? value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween, // 추가
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: FontSystem.Sub2),
         const SizedBox(height: 4),
-        Text(value, style: FontSystem.Sub2.copyWith(color: ColorSystem.grey)),
+        Text(
+          value ?? '정보 없음', // null 처리
+          style: FontSystem.Sub2.copyWith(color: ColorSystem.grey),
+        ),
       ],
     );
   }
 
   Widget _buildMemberList() {
-    // Get the team members from the ViewModel
+    final members = viewModel.teamInfoState.teamMembers ?? []; // null 처리
 
-    if (viewModel.teamInfoState.teamMembers.isEmpty) {
-      return const SizedBox
-          .shrink(); // Return an empty widget if no members exist
+    if (members.isEmpty) {
+      return const SizedBox.shrink(); // 빈 상태 처리
     }
 
-    return Obx(
-      () => Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: SizedBox(
-          height: 242,
-          width: 160,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('팀원', style: FontSystem.H2),
-                const SizedBox(height: 12),
-                // Render each member row
-                ...viewModel.teamInfoState.teamMembers
-                    .map((member) => _buildMemberRow(member))
-                    .toList(),
-              ],
-            ),
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SizedBox(
+        height: 242,
+        width: 160,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('팀원', style: FontSystem.H2),
+              const SizedBox(height: 12),
+              ...members.map((member) => _buildMemberRow(member)).toList(),
+            ],
           ),
         ),
       ),
@@ -154,13 +158,12 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
   }
 
   Widget _buildCircularProgressBar() {
-    double winRate = viewModel.teamInfoState.matchCnt > 0
-        ? (viewModel.teamInfoState.winCnt / viewModel.teamInfoState.matchCnt)
-        : 0.0;
-    double winRate100 = viewModel.teamInfoState.matchCnt > 0
-        ? (viewModel.teamInfoState.winCnt / viewModel.teamInfoState.matchCnt) *
-            100
-        : 0.0;
+    final matchCnt = viewModel.teamInfoState.matchCnt ?? 0; // null 처리
+    final winCnt = viewModel.teamInfoState.winCnt ?? 0; // null 처리
+
+    double winRate = matchCnt > 0 ? (winCnt / matchCnt) : 0.0;
+    double winRate100 = matchCnt > 0 ? (winCnt / matchCnt) * 100 : 0.0;
+
     return Card(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -174,17 +177,16 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
                 CircularProgressIndicator(
                   value: winRate,
                   strokeWidth: 20,
-                  strokeAlign: 3,
                   valueColor:
                       const AlwaysStoppedAnimation<Color>(ColorSystem.main),
                   backgroundColor: ColorSystem.grey[300],
                 ),
-                Text("$winRate100%", style: FontSystem.H3),
+                Text("${winRate100.toStringAsFixed(1)}%", style: FontSystem.H3),
               ],
             ),
             const SizedBox(height: 47),
             Text(
-              "${viewModel.teamInfoState.matchCnt}개의 대결 중\n${viewModel.teamInfoState.winCnt}경기를 이겼어요!",
+              "$matchCnt개의 대결 중\n$winCnt경기를 이겼어요!",
               style: FontSystem.Sub1.copyWith(color: ColorSystem.main),
             ),
           ],
@@ -194,11 +196,17 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
   }
 
   Widget _buildDistanceList() {
-    if (viewModel.currentMonthData == null) {
-      return const Center(child: Text("이번 달 데이터가 없습니다."));
+    final currentMonthData = viewModel.currentMonthData;
+
+    if (currentMonthData == null) {
+      return const Center(child: Text("이번 달 데이터가 없습니다.")); // null 처리
     }
 
-    final members = viewModel.currentMonthData!.members;
+    final members = currentMonthData.members;
+
+    if (members.isEmpty) {
+      return const Center(child: Text("팀원 데이터가 없습니다."));
+    }
 
     // Sort members by distance in descending order
     members.sort((a, b) => b.distance.compareTo(a.distance));
@@ -212,7 +220,8 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
         const SizedBox(height: 16),
         ...members.map(
           (member) {
-            final progress = member.distance / maxDistance;
+            final progress =
+                maxDistance > 0 ? member.distance / maxDistance : 0.0;
             String medal = '';
 
             // Assign medals based on rank
@@ -255,17 +264,15 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
   }
 
   Widget _buildLabeledTrash() {
-    // Access the labels data from the ViewModel
-    final labels = viewModel.teamInfoState.monthlyData["2024-12"]?.labels;
+    // Access the labels data from the ViewModel with null safety
+    final monthlyData = viewModel.teamInfoState.monthlyData?["2024-12"];
+    final labels = monthlyData?.labels ?? [];
 
-    if (labels == null || labels.isEmpty) {
-      return const Center(child: Text("라벨 데이터가 없습니다."));
+    if (labels.isEmpty) {
+      return const Center(child: Text("라벨 데이터가 없습니다.")); // null 처리
     }
 
-    // Determine the number of columns based on the number of labels
-    int crossAxisCount = labels.length > 6
-        ? 3
-        : 2; // Example logic to switch between 2 and 3 columns
+    final crossAxisCount = labels.length > 6 ? 3 : 2;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,12 +282,10 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
         const SizedBox(height: 16),
         GridView.builder(
           shrinkWrap: true,
-          physics:
-              const NeverScrollableScrollPhysics(), // Prevent scrolling inside the grid
+          physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount:
-                crossAxisCount, // Dynamic number of columns in the grid
-            childAspectRatio: 1, // Aspect ratio for each item
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: 1,
             mainAxisSpacing: 8,
             crossAxisSpacing: 8,
           ),
@@ -297,7 +302,7 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '$emoji',
+                    emoji,
                     style: FontSystem.H2.copyWith(color: ColorSystem.main),
                   ),
                   Text(
@@ -312,4 +317,36 @@ class GroupScreen extends BaseScreen<GroupViewModel> {
       ],
     );
   }
+}
+
+Widget _buildNotJoinedView() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Text(
+        '그룹 대항전에 참가하기 위해서는\n그룹에 소속되어 있어야 해요!',
+        style: FontSystem.H1.copyWith(color: Colors.black),
+        textAlign: TextAlign.center,
+      ),
+      const SizedBox(height: 24),
+      Image.asset(
+        'assets/images/earth_matching.png',
+        width: 400,
+        height: 400,
+        fit: BoxFit.contain,
+      ),
+      const SizedBox(height: 24),
+      RoundedRectangleTextButton(
+        text: '그룹 설정하기',
+        backgroundColor: ColorSystem.main,
+        borderRadius: 24,
+        textStyle: FontSystem.Sub2.copyWith(color: Colors.white),
+        onPressed: () {
+          Get.dialog(
+            const GroupRequestDialog(),
+          );
+        },
+      ),
+    ],
+  );
 }

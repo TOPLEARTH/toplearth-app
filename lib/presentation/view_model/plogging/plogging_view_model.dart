@@ -1,32 +1,32 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-import 'package:screenshot/screenshot.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/font_system.dart';
+import 'package:toplearth/core/wrapper/result_wrapper.dart';
 import 'package:toplearth/core/wrapper/state_wrapper.dart';
 import 'package:toplearth/domain/condition/plogging/finish_plogging_condition.dart';
 import 'package:toplearth/domain/condition/plogging/plogging_labeling_condition.dart';
 import 'package:toplearth/domain/condition/plogging/start_individual_plogging_condition.dart';
+import 'package:toplearth/domain/condition/plogging/upload_plogging_image_condition.dart';
 import 'package:toplearth/domain/entity/matching/matching_status_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_finish_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_image_list_state.dart';
 import 'package:toplearth/domain/entity/plogging/plogging_start_individual_state.dart';
-import 'package:toplearth/domain/type/e_labeling_status.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
 import 'package:toplearth/domain/usecase/plogging/finish_plogging_usecase.dart';
 import 'package:toplearth/domain/usecase/plogging/labeling_plogging_usecase.dart';
 import 'package:toplearth/domain/usecase/plogging/start_individual_plogging_usecase.dart';
-import 'package:toplearth/presentation/view/plogging/plogging_path_painter.dart';
-import 'dart:io';
-import 'package:toplearth/core/wrapper/result_wrapper.dart';
-import 'package:toplearth/domain/condition/plogging/upload_plogging_image_condition.dart';
 import 'package:toplearth/domain/usecase/plogging/upload_plogging_image_usecase.dart';
+import 'package:toplearth/presentation/view/plogging/plogging_path_painter.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
 import 'package:toplearth/presentation/view_model/plogging/MapHelper.dart';
 import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
@@ -64,10 +64,10 @@ class PloggingViewModel extends GetxController {
   late int ploggingId;
 
   // dummy data
-  final double distance = 5.5; // km
-  final int duration = 3600; // 초
-  final int pickUpCnt = 15; // 수거 갯수
-  final int burnedCalories = 200; // 칼로리
+  final RxDouble distance = 0.0.obs; // km
+  final RxInt duration = 3600.obs; // 초
+  late RxInt pickUpCnt = 0.obs; // 수거 갯수
+  final RxInt burnedCalories = 200.obs; // 칼로리
   final Rx<File?> ploggingImage = File('assets/icons/clean_marker.png').obs;
 
   /* ------------------------------------------------------ */
@@ -105,9 +105,34 @@ class PloggingViewModel extends GetxController {
     });
 
     // RootViewModel의 위치 변경을 감지하여 currentLocation 업데이트
+    _listenToPositionStream();
+
+    // RootViewModel 위치 변경 감지
     ever(_rootViewModel.latitude, (_) => _updateCurrentLocation());
     ever(_rootViewModel.longitude, (_) => _updateCurrentLocation());
   }
+
+  /// 위치 스트림 설정
+  void _listenToPositionStream() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 1, // 위치 변경 간 최소 거리 (1m)
+    );
+
+    _positionStreamSubscription =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+              (Position position) {
+            if (position.latitude != 0.0 && position.longitude != 0.0) {
+              currentLocation.value = NLatLng(position.latitude, position.longitude);
+              debugPrint('실시간 위치 업데이트: ${currentLocation.value.latitude}, ${currentLocation.value.longitude}');
+            }
+          },
+          onError: (error) {
+            debugPrint('위치 스트림 오류: $error');
+          },
+        );
+  }
+
 
   @override
   void onClose() {
@@ -184,15 +209,16 @@ class PloggingViewModel extends GetxController {
 
   Future<ResultWrapper> finishPlogging() async {
     StateWrapper<PloggingImageListState> state =
-        await _finishPloggingUsecase.execute(FinishPloggingCondition(
-      ploggingId: ploggingId,
-      ploggingData: PloggingFinishState(
-        distance: distance,
-        duration: duration,
-        pickUpCnt: pickUpCnt,
-        burnedCalories: burnedCalories,
+        await _finishPloggingUsecase.execute(
+      FinishPloggingCondition(
+        ploggingId: ploggingId,
+        ploggingData: PloggingFinishState(
+            distance: distance.value,
+            duration: duration.value,
+            pickUpCnt: pickUpCnt.value,
+            burnedCalories: burnedCalories.value),
       ),
-    ));
+    );
 
     if (state.success && state.data != null) {
       _ploggingImageListState.value = state.data!;
@@ -232,6 +258,8 @@ class PloggingViewModel extends GetxController {
           ploggingImage: screenshotFile,
         ),
       );
+
+      print('bro succeed');
 
       if (!state.success) {
         return ResultWrapper(
@@ -288,6 +316,7 @@ class PloggingViewModel extends GetxController {
       try {
         await addMarkerAtCurrentLocationWithCoordinates(latitude, longitude);
         Get.snackbar('성공', '사진 업로드 및 마커 추가 성공!');
+        pickUpCnt = pickUpCnt + 1;
         return ResultWrapper(success: true);
       } catch (e) {
         rethrow;
@@ -342,7 +371,6 @@ class PloggingViewModel extends GetxController {
     isLocationEnabled.value = true;
   }
 
-
   final MapHelper mapHelper = MapHelper();
 
   void onMapReady(NaverMapController controller) {
@@ -390,7 +418,7 @@ class PloggingViewModel extends GetxController {
     // 위치 스트림 시작
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 5, // 5미터마다 업데이트
+      distanceFilter: 1, // 1미터마다 업데이트
     );
 
     Position? lastPosition; // 마지막 기록된 위치
@@ -407,11 +435,12 @@ class PloggingViewModel extends GetxController {
           position.longitude,
         );
 
-        // 이동 거리가 10미터 이상인 경우에만 경로 추가
-        if (distanceMoved >= 10) {
+        // 이동 거리가 1미터 이상인 경우에만 경로 추가
+        if (distanceMoved >= 1) {
           _currentLocation = NLatLng(position.latitude, position.longitude);
           routeCoordinates.add(_currentLocation!);
           lastPosition = position; // 현재 위치를 마지막 위치로 업데이트
+          distance.value += distanceMoved / 1000;
 
           if (isFollowingLocation.value) {
             _updateCamera();

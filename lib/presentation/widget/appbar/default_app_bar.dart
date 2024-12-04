@@ -27,8 +27,7 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
         centerTitle: true,
         title: PngImageView(
           assetPath: _centerLogoPath,
-          height: 70, // Unified height with DefaultBackAppBar
-          margin: const EdgeInsets.only(left: 25), // Consistent margin
+          height: 64, // Unified height with DefaultBackAppBar
         ),
       );
     }

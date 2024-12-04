@@ -1,8 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:toplearth/app/config/app_routes.dart';
@@ -11,15 +14,14 @@ import 'package:toplearth/app/env/dev/dev_environment.dart';
 import 'package:toplearth/app/utility/health_util.dart';
 import 'package:toplearth/app/utility/notification_util.dart';
 import 'package:toplearth/data/factory/storage_factory.dart';
+import 'package:toplearth/firebase_options.dart';
 import 'package:toplearth/local_push_notifications.dart';
 import 'package:toplearth/main_app.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:toplearth/firebase_options.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
 void main() async {
   await onInitSystem();
   await onReadySystem();
+  FlutterNativeSplash.remove();
 
   runApp(const MainApp());
 }
@@ -31,7 +33,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> onInitSystem() async {
   // Widget Binding
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Firebase Initialize
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -43,10 +46,8 @@ Future<void> onInitSystem() async {
   await NaverMapSdk.instance.initialize(
     clientId: DevEnvironment.NAVER_CLIENT_ID,
   );
-
   // Kakao Initialize
   KakaoSdk.init(nativeAppKey: DevEnvironment.KAKAO_APP_KEY);
-
 
   // Firebase foreground
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -66,19 +67,17 @@ Future<void> onInitSystem() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessageOpenedApp.listen(
-    (RemoteMessage message) {
+        (RemoteMessage message) {
       debugPrint("🚀 백그라운드 알림 클릭됨!");
       debugPrint("🔗 클릭된 알림의 메시지 ID: ${message.messageId}");
       debugPrint("🔗 클릭된 알림의 데이터: ${message.data}");
-
-
 
       // 클릭한 알림의 mingiId를 로그 출력
       if (message.data.containsKey('mingiId')) {
         print("🔗 알림에서 받은 mingiId: ${message.data['mingiId']}");
       }
 
-      AlertDialog alert = AlertDialog(
+      AlertDialog alert = const AlertDialog(
         title: Text("알림 클릭됨!"),
         content: Text("알림 클릭됨!"),
       );

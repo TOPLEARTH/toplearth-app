@@ -30,7 +30,6 @@ abstract class BaseConnect extends GetConnect {
     "usedAuthorization": "true",
   };
 
-
   @override
   void onInit() {
     super.onInit();
@@ -52,11 +51,14 @@ abstract class BaseConnect extends GetConnect {
 
       // Authorization 처리
       String? usedAuthorization = headers["usedAuthorization"];
+
       /// accessToken 테스트를 원한다면 여기 _systemProvider.getAccessToken()대신 토큰 삽입하세요
       if (usedAuthorization == "true") {
         headers["Authorization"] = "Bearer ${_systemProvider.getAccessToken()}";
       }
-      debugPrint('current accessToken: ${_systemProvider.getAccessToken()}' );
+
+
+      debugPrint('current accessToken: ${_systemProvider.getAccessToken()}');
 
       // Splash Screen 처리
       if (!headers.containsKey("usedInSplashScreen")) {
@@ -123,6 +125,7 @@ abstract class BaseConnect extends GetConnect {
 
     httpClient.maxAuthRetries = 1;
   }
+
   Future<Response<dynamic>> _reissueToken() async {
     String refreshToken = _systemProvider.getRefreshToken();
 

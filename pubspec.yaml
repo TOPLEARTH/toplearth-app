@@ -62,7 +62,7 @@ dependencies:
 
   # Percent Indicator
   carousel_slider: ^4.2.1
-  syncfusion_flutter_charts: ^24.1.45
+#  syncfusion_flutter_charts: ^24.1.45
 
   # Permission And Health
   permission_handler: ^11.2.1
@@ -108,6 +108,8 @@ dependencies:
   geocoding: ^3.0.0
   web_socket_channel: ^2.4.0
   keyboard_avoider: ^0.2.0
+  flutter_native_splash: ^2.4.1
+
 
 dev_dependencies:
   # Default
@@ -173,3 +175,8 @@ flutter_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/images/app_icon_ios.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"  # 배경색 설정
+  image: assets/images/splash_image.png  # 스플래시 이미지 경로
+

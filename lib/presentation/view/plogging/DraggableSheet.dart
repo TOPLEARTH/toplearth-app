@@ -7,6 +7,7 @@ import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/presentation/view/plogging/request_permission.dart';
+import 'package:toplearth/presentation/view/root/matching_view_controller.dart';
 import 'package:toplearth/presentation/view_model/plogging/plogging_view_model.dart';
 
 class DraggableSheet extends BaseWidget<PloggingViewModel> {
@@ -27,6 +28,8 @@ class DraggableSheet extends BaseWidget<PloggingViewModel> {
             children: [
               _buildHandle(),
               const SizedBox(height: 16),
+              _buildCountdownTimer(), // 타이머 추가
+              const SizedBox(height: 16),
               _buildTitle(),
               const SizedBox(height: 16),
               _buildImagePreview(),
@@ -39,6 +42,22 @@ class DraggableSheet extends BaseWidget<PloggingViewModel> {
         );
       },
     );
+  }
+
+  Widget _buildCountdownTimer() {
+    final timerController = Get.find<MatchedViewController>();
+    return Obx(() {
+      return Center(
+        child: Text(
+          '남은 시간: ${timerController.formatTime(timerController.countdownTime.value)}',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildHandle() {
@@ -141,29 +160,6 @@ class DraggableSheet extends BaseWidget<PloggingViewModel> {
           },
         ),
         const SizedBox(height: 16),
-        // _buildButton(
-        //   label: '사진 업로드',
-        //   icon: Icons.upload_file,
-        //   onTap: () async {
-        //     final picker = ImagePicker();
-        //     final XFile? file =
-        //         await picker.pickImage(source: ImageSource.gallery);
-        //     if (file != null) {
-        //       viewModel.setSelectedImage(File(file.path));
-        //       final position = await Geolocator.getCurrentPosition(
-        //         desiredAccuracy: LocationAccuracy.high,
-        //       );
-        //       await viewModel.addMarkerAtCurrentLocationWithCoordinates(
-        //         position.latitude,
-        //         position.longitude,
-        //       );
-        //       await viewModel.uploadImage(
-        //         position.latitude,
-        //         position.longitude,
-        //       );
-        //     }
-        //   },
-        // ),
       ],
     );
   }

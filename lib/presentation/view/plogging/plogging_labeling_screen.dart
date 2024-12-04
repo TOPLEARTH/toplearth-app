@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
+import 'package:toplearth/app/config/font_system.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/presentation/view_model/plogging/plogging_view_model.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
@@ -11,7 +12,6 @@ import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_te
 class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
   final List<Map<String, dynamic>> ploggingImages;
 
-  // 생성자에서 Get.arguments를 안전하게 처리
   PloggingLabelingScreen({Key? key})
       : ploggingImages = Get.arguments['ploggingImages'] ?? [],
         super(key: key);
@@ -61,13 +61,15 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
       'serverLabel': 'GENERAL'
     },
   ];
-  buildView(BuildContext context) {
-    print('PloggingImages: $ploggingImages');
 
-    print('selectedLabels: $selectedLabels');
+  @override
+  Widget buildView(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('쓰레기 라벨링'),
+        title: const Text(
+          '쓰레기 라벨링',
+          style: FontSystem.H3,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -85,40 +87,64 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
                   final item = ploggingImages[index];
                   return GestureDetector(
                     onTap: () => _showLabelingDialog(context, item),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade300),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade300),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.network(
-                            item['imageUrl'],
-                            height: 80,
-                            width: 80,
-                            fit: BoxFit.cover,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16), // 둥근 모서리
+                            child: Image.network(
+                              item['imageUrl'],
+                              height: double.infinity,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          const SizedBox(height: 8),
-                          Obx(() {
-                            final label =
-                                selectedLabels[item['ploggingImageId']];
-                            return Text(
-                              label ?? '라벨 없음',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            );
-                          }),
-                        ],
-                      ),
+                        ),
+                        // 라벨링 완료된 이미지에 검은색 불투명 오버레이 및 아이콘 추가
+                        Obx(() {
+                          final isLabeled = selectedLabels
+                              .containsKey(item['ploggingImageId']);
+                          final label = selectedLabels[item['ploggingImageId']];
+
+                          return isLabeled
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                          '라벨링 완료',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink();
+                        }),
+                      ],
                     ),
                   );
                 },
@@ -142,30 +168,29 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.network(
-                image['imageUrl'],
-                height: 140,
-                width: 140,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '어떤 쓰레기를 주었는지 알려줄래요?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Expanded(child: _buildCategoryGrid(imageId)),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Get.back(), // Close dialog
-                child: const Text('닫기'),
-              ),
-            ],
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.9, // 화면 너비의 90%
+          height: MediaQuery.of(context).size.height * 0.8, // 화면 높이의 80%
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max, // 최대 크기 사용
+              children: [
+                const Text(
+                  '어떤 쓰레기를 주었는지 알려줄래요?',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: _buildCategoryGrid(imageId), // 남은 공간에 카테고리 그리드 배치
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text('닫기'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -183,16 +208,12 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
       itemCount: trashCategories.length,
       itemBuilder: (context, index) {
         final category = trashCategories[index];
-        final serverLabel =
-            category['serverLabel']; // Safely fetch the serverLabel
+        final serverLabel = category['serverLabel'];
         return Obx(() {
           final isSelected = selectedLabels[imageId] == serverLabel;
           return GestureDetector(
             onTap: () {
-              print('Selected Label: $serverLabel');
-              if (serverLabel != null) {
-                selectedLabels[imageId] = serverLabel; // Avoid null assignment
-              }
+              selectedLabels[imageId] = serverLabel!;
             },
             child: Container(
               decoration: BoxDecoration(
@@ -228,21 +249,14 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
   }
 
   void _submitLabels() {
-    // Ensure all images are labeled
     if (selectedLabels.length != ploggingImages.length) {
       Get.snackbar('오류', '모든 이미지에 대해 라벨을 선택해주세요.');
       return;
     }
 
-    // Extract imageIds and labels
     final imageIds = selectedLabels.keys.toList();
     final labels = selectedLabels.values.toList();
 
-    print('Selected Labels: $selectedLabels');
-    print('ImageIds: $imageIds');
-    print('Labels: $labels');
-
-    // Navigate to PLOGGING_SHARE and pass data
     Get.toNamed(
       AppRoutes.PLOGGING_SHARE,
       arguments: {

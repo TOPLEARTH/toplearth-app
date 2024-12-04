@@ -1,54 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timezone/timezone.dart' as tz;
 import 'package:toplearth/app/config/app_routes.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/app/config/font_system.dart';
+import 'package:toplearth/app/utility/hour_util.dart';
 import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/core/view/base_widget.dart';
 import 'package:toplearth/domain/type/e_matching_status.dart';
+import 'package:toplearth/presentation/view/home/user_information/user_earth_view.dart';
+import 'package:toplearth/presentation/view/matching/matching_widget/matched_view.dart';
 import 'package:toplearth/presentation/view/matching/real_time_team_activity_section.dart';
 import 'package:toplearth/presentation/view/matching/widget/matching_group_recent_plogging_widget.dart';
 import 'package:toplearth/presentation/view/root/build_plogging_view.dart';
-import 'package:toplearth/presentation/view/matching/matching_widget/matched_view.dart';
 import 'package:toplearth/presentation/view_model/matching/matching_view_model.dart';
+import 'package:toplearth/presentation/view_model/root/root_view_model.dart';
 import 'package:toplearth/presentation/widget/appbar/default_app_bar.dart';
 import 'package:toplearth/presentation/widget/button/common/rounded_rectangle_text_button.dart';
 import 'package:toplearth/presentation/widget/dialog/group_request_dialog.dart';
+
 import 'widget/plogging_preview_widget.dart';
-import 'package:intl/intl.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
   const MatchingScreen({super.key});
 
   @override
   PreferredSizeWidget? buildAppBar(BuildContext context) {
-    return const DefaultAppBar();
+    return const DefaultAppBar(isOnlyNeedCenterLogo: true);
   }
 
   @override
   Widget buildBody(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true, // 키보드가 올라오면 화면 조정
-      body: SingleChildScrollView(
-        child: Obx(() {
-          final currentStatus = viewModel.matchingStatus.value;
-          Widget statusView = _buildViewForStatus(currentStatus);
+    final rootViewModel = Get.find<RootViewModel>();
 
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                statusView,
-                const SizedBox(height: 24),
-              ],
-            ),
-          );
-        }),
-      ),
-    );
+    return Obx(() {
+      final teamId = rootViewModel.teamInfoState.value.teamId ?? 0;
+
+      print('sibal ${viewModel.teamId}');
+
+      if (teamId == 0) {
+        return _buildNotJoinedView();
+      }
+
+      return Scaffold(
+        resizeToAvoidBottomInset: true, // 키보드가 올라오면 화면 조정
+        body: SingleChildScrollView(
+          child: Obx(() {
+            final currentStatus = viewModel.matchingStatus.value;
+            Widget statusView = _buildViewForStatus(currentStatus);
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  statusView,
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          }),
+        ),
+      );
+    });
   }
 
   /// 현재 한국시간 기반으로 다음 시간 계산
@@ -120,75 +134,80 @@ class MatchingScreen extends BaseScreen<MatchingGroupViewModel> {
   Widget _buildDefaultView() {
     final nextHour = getNextHour();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          '${viewModel.teamInfoState.value.teamName}팀은 현재\n플로깅을 쉬고 있어요!',
-          style: FontSystem.H1.copyWith(color: Colors.black),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 24),
-        RoundedRectangleTextButton(
-          onPressed: () {
-            viewModel.requestRandomMatching();
-            Get.snackbar('랜덤 매칭', '랜덤 매칭 요청이 실행되었습니다.');
-          },
-          text: '$nextHour시 플로깅 랜덤매칭 하기',
-          icon: Image.asset(
-            'assets/images/matching_dice_image.png',
-            width: 36,
-            height: 36,
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '${viewModel.teamInfoState.value.teamName}팀은 현재\n플로깅을 쉬고 있어요!',
+            style: FontSystem.H1.copyWith(color: Colors.black),
+            textAlign: TextAlign.center,
           ),
-          backgroundColor: Colors.white,
-          textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
-          borderRadius: 16.0,
-          borderWidth: 0.7,
-          borderColor: ColorSystem.main,
-        ),
-        const SizedBox(height: 16),
-        RoundedRectangleTextButton(
-          text: '$nextHour시 플로깅 지정매칭 하기',
-          icon: Image.asset(
-            'assets/images/matching_target_image.png',
-            width: 36,
-            height: 36,
+          const SizedBox(height: 24),
+          RoundedRectangleTextButton(
+            onPressed: () {
+              viewModel.requestRandomMatching();
+              // Get.snackbar('랜덤 매칭', '랜덤 매칭 요청이 실행되었습니다.');
+            },
+            text: '$nextHour시 플로깅 랜덤매칭 하기',
+            icon: Image.asset(
+              'assets/images/matching_dice_image.png',
+              width: 36,
+              height: 36,
+            ),
+            backgroundColor: Colors.white,
+            textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
+            borderRadius: 16.0,
+            borderWidth: 0.7,
+            borderColor: ColorSystem.main,
           ),
-          backgroundColor: Colors.white,
-          textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
-          borderRadius: 16.0,
-          borderWidth: 0.7,
-          borderColor: ColorSystem.main,
-          onPressed: () {
-            Get.snackbar('지정 매칭', '지정 매칭 요청이 실행되었습니다.');
-          },
-        ),
-        const SizedBox(height: 16),
-        RoundedRectangleTextButton(
-          text: '지금 플로깅 혼자하러 가기',
-          icon: Image.asset(
-            'assets/images/matching_plogging_image.png',
-            width: 36,
-            height: 36,
+          const SizedBox(height: 16),
+          RoundedRectangleTextButton(
+            text: '$nextHour시 플로깅 지정매칭 하기',
+            icon: Image.asset(
+              'assets/images/matching_target_image.png',
+              width: 36,
+              height: 36,
+            ),
+            backgroundColor: Colors.white,
+            textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
+            borderRadius: 16.0,
+            borderWidth: 0.7,
+            borderColor: ColorSystem.main,
+            onPressed: () {
+              // Get.snackbar('지정 매칭', '지정 매칭 요청이 실행되었습니다.');
+            },
           ),
-          backgroundColor: Colors.white,
-          textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
-          borderRadius: 16.0,
-          borderWidth: 0.7,
-          borderColor: ColorSystem.main,
-          onPressed: () {
-            Get.toNamed(AppRoutes.PLOGGING);
-          },
-        ),
-        const SizedBox(height: 16),
-        RealTimeTeamActivitySection(),
-        const PreviewPloggingMap(),
-        const RecentPloggingPreview(),
-      ],
+          const SizedBox(height: 16),
+          RoundedRectangleTextButton(
+            text: '지금 플로깅 혼자하러 가기',
+            icon: Image.asset(
+              'assets/images/matching_plogging_image.png',
+              width: 36,
+              height: 36,
+            ),
+            backgroundColor: Colors.white,
+            textStyle: FontSystem.H3.copyWith(color: ColorSystem.main),
+            borderRadius: 16.0,
+            borderWidth: 0.7,
+            borderColor: ColorSystem.main,
+            onPressed: () {
+              Get.toNamed(AppRoutes.PLOGGING);
+            },
+          ),
+          const SizedBox(height: 16),
+          RealTimeTeamActivitySection(),
+          const PreviewPloggingMap(),
+          const RecentPloggingPreview(),
+        ],
+      ),
     );
   }
 }
 
+final int nextHour = getNextHour();
+
+/// WAITING View
 /// WAITING View
 class _buildWaitingView extends BaseWidget<MatchingGroupViewModel> {
   @override
@@ -197,43 +216,22 @@ class _buildWaitingView extends BaseWidget<MatchingGroupViewModel> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          '${viewModel.teamInfoState.value.teamName}은 현재\n7시 플로깅 매칭중이에요!',
+          '${viewModel.teamInfoState.value.teamName}팀은 현재\n $nextHour시 플로깅 매칭중이에요!',
           style: FontSystem.H1.copyWith(color: Colors.black),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
-        Image.asset(
-          'assets/images/earth_matching.png',
-          width: 400,
-          height: 400,
-          fit: BoxFit.contain,
-        ),
+        UserEarthView(),
         const SizedBox(height: 24),
-        RoundedRectangleTextButton(
-          text: '그룹 설정하기',
-          backgroundColor: ColorSystem.main,
-          borderRadius: 24,
-          textStyle: FontSystem.Sub2.copyWith(color: Colors.white),
-          onPressed: () {
-            // GroupRequestDialog 다이얼로그 띄우기
-            Get.dialog(
-              const GroupRequestDialog(),
-            );
-          },
+        Text(
+          '매 시 정각에 플로깅 대결 매칭이 시작합니다!\n쓰레기 봉투를 준비해 주세요!',
+          style: FontSystem.H3.copyWith(
+            color: ColorSystem.main,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-
-  /// PLOGGING VIEW
-
-  /// FINISHED View
-  Widget _buildFinishedView() {
-    return Center(
-      child: Text(
-        '매칭이 종료되었습니다.',
-        style: FontSystem.Sub2.copyWith(color: Colors.black),
-      ),
     );
   }
 }

@@ -9,9 +9,10 @@ class LoginMiddleware extends GetMiddleware {
     bool isNotLogin = !StorageFactory.systemProvider.isLogin;
 
     if (isNotLogin) {
+      // 로그인 상태가 아니면 로그인 페이지로 이동
       return const RouteSettings(name: AppRoutes.LOGIN);
     }
 
-    return null;
+    return null; // 로그인 상태면 아무 것도 하지 않음
   }
 }

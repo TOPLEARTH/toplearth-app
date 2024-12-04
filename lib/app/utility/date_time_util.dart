@@ -39,6 +39,10 @@ class DateTimeUtil {
     return DateFormat('yyyy년 MM월 dd일 HH:mm').format(date);
   }
 
+  static String convertFromDateTimeToKoreanWithoutMinute(DateTime date) {
+    return DateFormat('yyyy년 MM월 dd일 HH시').format(date);
+  }
+
   static String convertFromDateTimeToCalendarForm(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
   }

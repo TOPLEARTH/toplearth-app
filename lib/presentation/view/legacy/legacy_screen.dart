@@ -1,5 +1,6 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+// import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:toplearth/app/config/color_system.dart';
 import 'package:toplearth/core/view/base_screen.dart';
 import 'package:toplearth/presentation/view/legacy/widget/animated_counter_text.dart';
@@ -118,11 +119,27 @@ class LegacyScreen extends BaseScreen<LegacyViewModel> {
   }
 
   Widget _buildTrashChart() {
+    int getMaxValue() {
+      final trashInfo = viewModel.legacyInfoState.trashInfo;
+      return [
+        trashInfo.plastic,
+        trashInfo.foodWaste,
+        trashInfo.glassBottle,
+        trashInfo.cigaretteButt,
+        trashInfo.paper,
+        trashInfo.disposableContainer,
+        trashInfo.can,
+        trashInfo.plasticBag,
+        trashInfo.others,
+      ].reduce((max, value) => max > value ? max : value);
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          const SizedBox(height: 32),
           const Text(
             "함께 주운 다양한 쓰레기 종류들",
             style: TextStyle(
@@ -132,75 +149,68 @@ class LegacyScreen extends BaseScreen<LegacyViewModel> {
           ),
           const SizedBox(height: 8),
           const Text(
-            "당신이 실천한 발걸음으로 지구가 더 깨끗해집니다.",
+            "🌍 당신이 실천한 발걸음으로 지구가 더 깨끗해집니다.",
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 16),
           SizedBox(
             height: 300,
-            child: SfCartesianChart(
-              primaryXAxis: CategoryAxis(
-                labelRotation: 45,
-                labelStyle: const TextStyle(fontSize: 12),
-              ),
-              primaryYAxis: NumericAxis(
-                minimum: 0,
-                interval: 5,
-              ),
-              series: <CartesianSeries>[
-                ColumnSeries<Map<String, dynamic>, String>(
-                  dataSource: [
-                    {
-                      'category': '플라스틱',
-                      'value': viewModel.legacyInfoState.trashInfo.plastic
-                    },
-                    {
-                      'category': '음식물',
-                      'value': viewModel.legacyInfoState.trashInfo.foodWaste
-                    },
-                    {
-                      'category': '유리병',
-                      'value': viewModel.legacyInfoState.trashInfo.glassBottle
-                    },
-                    {
-                      'category': '담배꽁초',
-                      'value': viewModel.legacyInfoState.trashInfo.cigaretteButt
-                    },
-                    {
-                      'category': '종이',
-                      'value': viewModel.legacyInfoState.trashInfo.paper
-                    },
-                    {
-                      'category': '일회용기',
-                      'value': viewModel
-                          .legacyInfoState.trashInfo.disposableContainer
-                    },
-                    {
-                      'category': '캔',
-                      'value': viewModel.legacyInfoState.trashInfo.can
-                    },
-                    {
-                      'category': '비닐',
-                      'value': viewModel.legacyInfoState.trashInfo.plasticBag
-                    },
-                    {
-                      'category': '기타',
-                      'value': viewModel.legacyInfoState.trashInfo.others
-                    },
-                  ],
-                  xValueMapper: (Map<String, dynamic> data, _) =>
-                      data['category'] as String,
-                  yValueMapper: (Map<String, dynamic> data, _) =>
-                      data['value'] as int,
-                  animationDuration: 2000,
-                  borderRadius: BorderRadius.circular(4),
-                  // 그라데이션 색상 적용
-                  onCreateRenderer:
-                      (ChartSeries<Map<String, dynamic>, String> series) {
-                    return GradientColumnSeriesRenderer();
-                  },
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: getMaxValue() * 1.2,
+                barTouchData: BarTouchData(enabled: true),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        const titles = [
+                          '플라스틱',
+                          '음식물',
+                          '유리병',
+                          '담배꽁초',
+                          '종이',
+                          '일회용기',
+                          '캔',
+                          '비닐',
+                          '기타'
+                        ];
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Transform.rotate(
+                            angle: -0.8,
+                            child: Text(
+                              titles[value.toInt()],
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        );
+                      },
+                      reservedSize: 40,
+                    ),
+                  ),
                 ),
-              ],
+                borderData: FlBorderData(show: false),
+                barGroups: [
+                  _makeGroupData(
+                      0, viewModel.legacyInfoState.trashInfo.plastic),
+                  _makeGroupData(
+                      1, viewModel.legacyInfoState.trashInfo.foodWaste),
+                  _makeGroupData(
+                      2, viewModel.legacyInfoState.trashInfo.glassBottle),
+                  _makeGroupData(
+                      3, viewModel.legacyInfoState.trashInfo.cigaretteButt),
+                  _makeGroupData(4, viewModel.legacyInfoState.trashInfo.paper),
+                  _makeGroupData(5,
+                      viewModel.legacyInfoState.trashInfo.disposableContainer),
+                  _makeGroupData(6, viewModel.legacyInfoState.trashInfo.can),
+                  _makeGroupData(
+                      7, viewModel.legacyInfoState.trashInfo.plasticBag),
+                  _makeGroupData(8, viewModel.legacyInfoState.trashInfo.others),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -212,27 +222,22 @@ class LegacyScreen extends BaseScreen<LegacyViewModel> {
       ),
     );
   }
-}
 
-// Custom renderer for adding gradients
-class GradientColumnSeriesRenderer
-    extends ColumnSeriesRenderer<Map<String, dynamic>, String> {
-  @override
-  ColumnSegment<Map<String, dynamic>, String> createSegment() {
-    return GradientColumnSegment();
-  }
-}
-
-class GradientColumnSegment
-    extends ColumnSegment<Map<String, dynamic>, String> {
-  @override
-  void onPaint(Canvas canvas) {
-    final gradient = LinearGradient(
-      colors: [Colors.blue, Colors.green],
-      begin: Alignment.bottomCenter,
-      end: Alignment.topCenter,
+  BarChartGroupData _makeGroupData(int x, int y) {
+    // double을 int로 변경
+    return BarChartGroupData(
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: y.toDouble(), // int를 double로 변환
+          gradient: const LinearGradient(
+            colors: [Colors.blue, Colors.green],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+        ),
+      ],
     );
-    fillPaint?.shader = gradient.createShader(segmentRect!.outerRect);
-    super.onPaint(canvas);
   }
 }

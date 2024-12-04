@@ -50,12 +50,14 @@ class StoreScreen extends BaseScreen<StoreViewModel> {
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Text(
-              "포인트를 사용하여 원하는 상품을 교환하세요!",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            child: Center(
+              child: const Text(
+                "포인트를 사용하여 원하는 상품권을 교환해요!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

@@ -3,12 +3,14 @@ class MemberState {
   final String name;
   final String role;
   final double distance;
+  final bool isActive;
 
   MemberState({
     required this.id,
     required this.name,
     required this.role,
     required this.distance,
+    required this.isActive,
   });
 
   MemberState copyWith({
@@ -16,12 +18,14 @@ class MemberState {
     String? name,
     String? role,
     double? distance,
+    bool? isActive,
   }) {
     return MemberState(
       id: id ?? this.id,
       name: name ?? this.name,
       role: role ?? this.role,
       distance: distance ?? this.distance,
+      isActive: isActive ?? this.isActive,
     );
   }
 
@@ -31,6 +35,7 @@ class MemberState {
       name: json['name'] ?? '',
       role: json['role'] ?? '',
       distance: (json['distance'] as num?)?.toDouble() ?? 0.0,
+      isActive: json['isActive'] ?? false,
     );
   }
 }
