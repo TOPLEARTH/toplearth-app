@@ -105,9 +105,34 @@ class PloggingViewModel extends GetxController {
     });
 
     // RootViewModel의 위치 변경을 감지하여 currentLocation 업데이트
+    _listenToPositionStream();
+
+    // RootViewModel 위치 변경 감지
     ever(_rootViewModel.latitude, (_) => _updateCurrentLocation());
     ever(_rootViewModel.longitude, (_) => _updateCurrentLocation());
   }
+
+  /// 위치 스트림 설정
+  void _listenToPositionStream() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 1, // 위치 변경 간 최소 거리 (1m)
+    );
+
+    _positionStreamSubscription =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+              (Position position) {
+            if (position.latitude != 0.0 && position.longitude != 0.0) {
+              currentLocation.value = NLatLng(position.latitude, position.longitude);
+              debugPrint('실시간 위치 업데이트: ${currentLocation.value.latitude}, ${currentLocation.value.longitude}');
+            }
+          },
+          onError: (error) {
+            debugPrint('위치 스트림 오류: $error');
+          },
+        );
+  }
+
 
   @override
   void onClose() {

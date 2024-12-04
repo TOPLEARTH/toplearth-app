@@ -117,40 +117,31 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
                           final isLabeled = selectedLabels
                               .containsKey(item['ploggingImageId']);
                           final label = selectedLabels[item['ploggingImageId']];
-                          final icon = trashCategories.firstWhere(
-                                  (category) =>
-                              category['serverLabel'] == label)['icon'];
 
                           return isLabeled
                               ? Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    icon!,
-                                    height: 48,
-                                    width: 48,
-
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    '라벨링 완료',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                          '라벨링 완료',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          )
+                                )
                               : const SizedBox.shrink();
                         }),
                       ],
@@ -177,33 +168,29 @@ class PloggingLabelingScreen extends BaseWidget<PloggingViewModel> {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.network(
-                image['imageUrl'],
-                height: 140,
-                width: 140,
-                fit: BoxFit.cover,
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '어떤 쓰레기를 주었는지 알려줄래요?',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: _buildCategoryGrid(imageId),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Get.back(),
-                child: const Text('닫기'),
-              ),
-            ],
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.9, // 화면 너비의 90%
+          height: MediaQuery.of(context).size.height * 0.8, // 화면 높이의 80%
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max, // 최대 크기 사용
+              children: [
+                const Text(
+                  '어떤 쓰레기를 주었는지 알려줄래요?',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: _buildCategoryGrid(imageId), // 남은 공간에 카테고리 그리드 배치
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text('닫기'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

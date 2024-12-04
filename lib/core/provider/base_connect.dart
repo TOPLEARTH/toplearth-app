@@ -54,13 +54,9 @@ abstract class BaseConnect extends GetConnect {
 
       /// accessToken 테스트를 원한다면 여기 _systemProvider.getAccessToken()대신 토큰 삽입하세요
       if (usedAuthorization == "true") {
-        // headers["Authorization"] = "Bearer ${_systemProvider.getAccessToken()}";
+        headers["Authorization"] = "Bearer ${_systemProvider.getAccessToken()}";
       }
 
-      // headers["Authorization"] = "Bearer eyJKV1QiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiI0YTE5MDRkZS01MmIxLTRjMmMtOTk4NS1lNGFkMDYxN2VkYzIiLCJ1c2VyUm9sZSI6IlVTRVIiLCJpYXQiOjE3MzMwNzcxODksImV4cCI6MTczNTY2OTE4OX0.0jCR6iAnolddX4nkcv2jHnpnE75jTwy9vS2--gWnddFrcJ4p-ykR3pq7fWFQxgQnBf10rL0Yn1pz7kxLDnmmmg";
-
-      headers["Authorization"] =
-          "Bearer eyJKV1QiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOiJiMjc1YmJmNy0xN2Y5LTQ0OTMtOGRlYi1kOTBiNzVmZjA2NTgiLCJ1c2VyUm9sZSI6IlVTRVIiLCJpYXQiOjE3MzI0NDE1NDAsImV4cCI6MTczNTAzMzU0MH0.vJVHdSLY0QoE5wt08Tv6_8zJywpyo3vp9MkloY0TVZYq5RBpdn_MiTMbWI8DCemowYHuMWfdwC4L63KCQTaeYg";
 
       debugPrint('current accessToken: ${_systemProvider.getAccessToken()}');
 

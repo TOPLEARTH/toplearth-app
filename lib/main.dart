@@ -67,7 +67,7 @@ Future<void> onInitSystem() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessageOpenedApp.listen(
-    (RemoteMessage message) {
+        (RemoteMessage message) {
       debugPrint("🚀 백그라운드 알림 클릭됨!");
       debugPrint("🔗 클릭된 알림의 메시지 ID: ${message.messageId}");
       debugPrint("🔗 클릭된 알림의 데이터: ${message.data}");

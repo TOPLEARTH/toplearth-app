@@ -7,9 +7,9 @@ class OnBoardingMiddleware extends GetMiddleware {
   @override
   RouteSettings? redirect(String? route) {
     if (StorageFactory.systemProvider.getFirstRun()) {
-      StorageFactory.systemProvider.setFirstRun(false);
+      // 첫 실행 시 온보딩 페이지로 이동
       return const RouteSettings(name: AppRoutes.ON_BOARDING);
     }
-    return null;
+    return null; // 첫 실행이 아니면 아무 것도 하지 않음
   }
 }
